@@ -1,0 +1,5 @@
+import { PageHero } from "@/components/PageHero";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata("Çerez Politikası", "cemwebstudio çerez kullanım bilgilendirmesi.", "/cerez-politikasi");
+export default function CookiePage() { return <><PageHero eyebrow="YASAL" title="Çerez Politikası" description="Sitenin mevcut çerez yaklaşımına ilişkin bilgilendirme." /><section className="section"><article className="container legal"><h2>Mevcut kullanım</h2><p>Bu sürümde reklam, kişiselleştirme veya davranışsal analiz amacıyla çerez yerleştiren bir araç yapılandırılmamıştır.</p><h2>Zorunlu teknik işlemler</h2><p>Hosting altyapısı güvenlik, yük dengeleme veya oturum sürekliliği için zorunlu teknik veriler işleyebilir. Böyle bir çerez yalnızca hizmetin çalışması ve korunması amacıyla kullanılmalıdır.</p><h2>Gelecekteki değişiklikler</h2><p>Analitik veya üçüncü taraf araçlar sonradan eklenirse bu politika güncellenmeli ve gereken durumlarda ziyaretçiden önceden onay alınmalıdır.</p></article></section></>; }

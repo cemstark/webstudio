@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <section className="pageHero section"><div className="container"><p className="eyebrow">404</p><h1 className="display">Bu sayfa burada değil.</h1><div className="heroLower"><p className="lead">Bağlantı değişmiş veya sayfa kaldırılmış olabilir.</p><div><Link className="button" href="/">Ana Sayfaya Dön</Link></div></div></div></section>; }
