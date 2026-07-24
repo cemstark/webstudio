@@ -4,9 +4,12 @@ type PageHeroProps = { eyebrow: string; title: string; description: string; pric
 
 export function PageHero({ eyebrow, title, description, priceSignal, cta }: PageHeroProps) {
   return (
-    <section className="pageHero section">
+    <section className="pageHero section" data-header-theme="light">
       <div className="container">
-        <p className="eyebrow reveal">{eyebrow}</p>
+        <div className="pageHeroHeading">
+          <p className="eyebrow reveal">{eyebrow}</p>
+          <p className="micro pageHeroIndex" aria-hidden="true">CWS / 2026</p>
+        </div>
         <h1 className="display reveal delayOne">{title}</h1>
         <div className="heroLower reveal delayTwo">
           <p className="lead">{description}</p>

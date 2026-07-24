@@ -2,16 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/content/projects";
 
-export function ProjectGrid({ items, priorityFirst = false }: { items: readonly Project[]; priorityFirst?: boolean }) {
+export function ProjectGrid({ items, priorityFirst = false, editorial = false }: { items: readonly Project[]; priorityFirst?: boolean; editorial?: boolean }) {
   return (
-    <div className="projectGrid">
+    <div className={`projectGrid ${editorial ? "projectGridEditorial" : ""}`}>
       {items.map((project, index) => (
         <article className="projectCard" key={project.slug}>
           <Link className="projectVisual" href={`/projeler/${project.slug}`} aria-label={`${project.name} projesini gör`}>
             {project.image ? (
               <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 900px) 50vw, 100vw" priority={priorityFirst && index === 0} />
             ) : (
-              <span className="projectPlaceholder"><span>{project.name}</span><small>Görsel bekleniyor</small></span>
+              <span className="projectPlaceholder"><span>{project.name}</span><small>Arşiv / içerik hazırlanıyor</small></span>
             )}
           </Link>
           <div className="projectMeta"><span>{project.year ?? "—"} · {project.statusLabel}</span><span>{project.category}</span></div>

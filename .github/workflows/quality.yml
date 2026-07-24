@@ -22,3 +22,5 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://cemwebstudio.com
       - run: npm run test:smoke
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

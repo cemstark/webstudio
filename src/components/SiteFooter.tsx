@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="container footerGrid">
         <div>
           <Link className="brand footerBrand" href="/">cem<span>webstudio</span></Link>
-          <p>Markalar için hızlı, bulunabilir ve dönüşüm odaklı dijital ürünler.</p>
+          <p>Cesur fikirleri çalışan, bulunabilir ve hatırlanır dijital ürünlere dönüştüren solo stüdyo.</p>
         </div>
         <nav aria-label="Alt navigasyon">
           <p className="micro">KEŞFET</p>

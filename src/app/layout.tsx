@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { MotionObserver } from "@/components/motion/MotionObserver";
+import { RouteTransition } from "@/components/motion/RouteTransition";
 import { site } from "@/content/site";
 import { getSiteUrl, JsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -40,6 +42,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <a className="skipLink" href="#main-content">Ana içeriğe geç</a>
         <JsonLd data={businessSchema} />
+        <MotionObserver />
+        <RouteTransition />
         <SiteHeader />
         <main id="main-content" tabIndex={-1}>{children}</main>
         <SiteFooter />

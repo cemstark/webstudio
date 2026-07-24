@@ -32,6 +32,10 @@ try {
     console.log(`${response.status} ${route}`);
   }
 
+  const unknownProject = await fetch(`${baseUrl}/projeler/bilinmeyen-proje`);
+  if (unknownProject.status !== 404) throw new Error(`Unknown project returned ${unknownProject.status}`);
+  console.log("404 /projeler/bilinmeyen-proje");
+
   const invalidResponse = await fetch(`${baseUrl}/api/contact`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "x" }) });
   if (invalidResponse.status !== 400) throw new Error(`Invalid contact payload returned ${invalidResponse.status}`);
   console.log("400 /api/contact invalid");
@@ -39,6 +43,18 @@ try {
   const smtpResponse = await fetch(`${baseUrl}/api/contact`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "Test User", email: "test@example.com", phone: "", company: "", service: "web-tasarim", package: "Başlangıç", budget: "7.000–15.000 TL", targetDate: "", summary: "Bu yalnızca SMTP yapılandırma davranışını doğrulayan test briefidir.", privacy: true, website: "", startedAt: Date.now() - 5000 }) });
   if (smtpResponse.status !== 503) throw new Error(`Unconfigured SMTP returned ${smtpResponse.status}`);
   console.log("503 /api/contact smtp-missing");
+
+  const tooFastResponse = await fetch(`${baseUrl}/api/contact`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.10" }, body: JSON.stringify({ name: "Test User", email: "test@example.com", phone: "", company: "", service: "web-tasarim", package: "Başlangıç", budget: "7.000–15.000 TL", targetDate: "", summary: "Bu yalnızca minimum gönderim süresini doğrulayan test briefidir.", privacy: true, website: "", startedAt: Date.now() }) });
+  if (tooFastResponse.status !== 400) throw new Error(`Too-fast contact payload returned ${tooFastResponse.status}`);
+  console.log("400 /api/contact minimum-submit-time");
+
+  let rateLimitStatus = 0;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const response = await fetch(`${baseUrl}/api/contact`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "198.51.100.20" }, body: JSON.stringify({ name: "x" }) });
+    rateLimitStatus = response.status;
+  }
+  if (rateLimitStatus !== 429) throw new Error(`Sixth contact attempt returned ${rateLimitStatus}`);
+  console.log("429 /api/contact rate-limit");
 } finally {
   server.kill();
 }
