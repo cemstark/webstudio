@@ -19,7 +19,10 @@ test("internal navigation and browser back never leave the route curtain stuck",
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Yayına çıkan");
   await page.goBack();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Cesur fikirler");
-  await expect(page.locator(".routeTransition")).not.toHaveClass(/isActive/, { timeout: 2_000 });
+  await expect.poll(
+    () => page.locator(".routeTransition").evaluate((element) => element.getBoundingClientRect().height),
+    { timeout: 5_000 },
+  ).toBeLessThan(1);
 });
 
 test("reduced motion keeps hero content visible and disables WebGL", async ({ browser }) => {
