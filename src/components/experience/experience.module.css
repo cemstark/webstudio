@@ -1,9 +1,11 @@
 .experienceLayer {
-  position: absolute;
+  --robot-stage-progress: 0;
+  position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 2;
   overflow: clip;
   pointer-events: none;
+  contain: layout paint;
 }
 
 .intro {
@@ -21,62 +23,194 @@
 .intro > span span { color: #2d62ff; }
 .intro i { display: block; width: 100%; height: 2px; background: #242938; overflow: hidden; }
 .intro i::after { content: ""; display: block; width: 100%; height: 100%; background: #2d62ff; transform-origin: left; }
-.introPlaying { opacity: 1; pointer-events: auto; animation: introOut 1s .08s both; }
-.introPlaying i::after { animation: introProgress .7s var(--ease-expressive) both; }
+.introPlaying { opacity: 1; pointer-events: auto; animation: introOut .82s .04s both; }
+.introPlaying i::after { animation: introProgress .62s var(--ease-expressive) both; }
 @keyframes introProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes introOut { 0%, 68% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@keyframes introOut { 0%, 64% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 
-.canvas,
-.poster {
-  position: fixed !important;
+.robotViewport {
+  position: fixed;
+  top: 0;
+  right: -2vw;
+  width: min(76vw, 72rem);
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 1;
+  transform: translate3d(2vw, calc((var(--robot-stage-progress) - .5) * -1.5rem), 0) scale(.82);
+  transform-origin: 56% 55%;
+  mask-image: radial-gradient(ellipse 72% 76% at 57% 52%, #000 45%, transparent 100%);
+  transition: transform .85s var(--ease-expressive), opacity .5s ease;
+}
+
+.splineMount,
+.robotFallback {
+  position: absolute !important;
   inset: 0;
   width: 100%;
-  height: 100svh;
+  height: 100%;
 }
 
-.canvas {
+.splineMount {
   z-index: 2;
+  opacity: 0;
+  pointer-events: auto;
+  touch-action: pan-y;
+  transition: opacity .55s ease;
 }
 
-.poster {
+.splineMount canvas { width: 100% !important; height: 100% !important; touch-action: pan-y; }
+
+[data-scene-status="ready"] .splineMount { opacity: 1; }
+[data-scene-status="ready"] .robotFallback { opacity: 0; }
+[data-scene-status="failed"] .robotFallback { opacity: 1; }
+
+.robotFallback {
   z-index: 1;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 58% 42%, rgb(83 122 255 / .2), transparent 24%),
+    linear-gradient(135deg, transparent 42%, rgb(45 98 255 / .08) 42.2%, transparent 42.6%);
   opacity: 1;
-  transition: opacity 300ms ease;
+  transition: opacity .45s ease;
 }
 
-[data-experience-profile="full"] .poster {
-  opacity: 0;
-}
-
-.orbit {
+.fallbackHalo {
   position: absolute;
-  width: min(48vw, 34rem);
+  width: min(70%, 42rem);
   aspect-ratio: 1;
-  border: clamp(.7rem, 1.5vw, 1.2rem) solid currentColor;
-  border-right-color: transparent;
+  border: 1px solid rgb(121 150 255 / .35);
   border-radius: 50%;
-  filter: drop-shadow(0 1.4rem 2.8rem rgb(0 0 0 / .24));
+  box-shadow: 0 0 8rem rgb(45 98 255 / .17), inset 0 0 4rem rgb(45 98 255 / .08);
 }
 
-.orbitOne { color: #2d62ff; transform: translate(-18%, -4%) rotate(22deg) scale(.72); }
-.orbitTwo { color: #f5f7ff; transform: translate(22%, -12%) rotate(194deg) scale(.67); }
-.orbitThree { color: #222732; transform: translate(-16%, 22%) rotate(112deg) scale(.58); }
-.orbitFour { color: #a8bbff; transform: translate(24%, 24%) rotate(292deg) scale(.5); }
+.fallbackGrid {
+  position: absolute;
+  inset: 13% 5%;
+  background-image: linear-gradient(rgb(117 136 190 / .09) 1px, transparent 1px), linear-gradient(90deg, rgb(117 136 190 / .09) 1px, transparent 1px);
+  background-size: 3.2rem 3.2rem;
+  mask-image: radial-gradient(circle, #000, transparent 70%);
+}
 
-@media (max-width: 899px) {
-  .poster {
-    align-items: end;
-    padding-bottom: 12svh;
+.fallbackFigure {
+  position: relative;
+  width: min(50%, 27rem);
+  aspect-ratio: .63;
+  filter: drop-shadow(0 2rem 3rem rgb(0 0 0 / .7));
+  transform: translateY(8%);
+}
+
+.fallbackHead,
+.fallbackNeck,
+.fallbackTorso,
+.fallbackArm {
+  position: absolute;
+  display: block;
+  background: linear-gradient(112deg, #050608 6%, #41454d 40%, #090a0d 62%, #8f96a3 76%, #07080a 89%);
+  border: 1px solid rgb(216 224 239 / .18);
+}
+
+.fallbackHead {
+  z-index: 3;
+  left: 31%;
+  top: 2%;
+  width: 38%;
+  height: 24%;
+  border-radius: 46% 46% 38% 38%;
+  box-shadow: inset 0 -1.5rem 2.5rem #020304;
+}
+
+.fallbackHead::after {
+  content: "";
+  position: absolute;
+  inset: 43% 13% 20%;
+  border-radius: 999px;
+  background: #020306;
+  border: 1px solid rgb(89 120 255 / .45);
+}
+
+.fallbackHead i {
+  position: absolute;
+  z-index: 2;
+  top: 56%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #7392ff;
+  box-shadow: 0 0 1rem #2d62ff;
+}
+
+.fallbackHead i:first-child { left: 35%; }
+.fallbackHead i:last-child { right: 35%; }
+.fallbackNeck { left: 43%; top: 24%; width: 14%; height: 8%; border-radius: 25%; }
+
+.fallbackTorso {
+  z-index: 2;
+  left: 16%;
+  top: 29%;
+  width: 68%;
+  height: 55%;
+  border-radius: 45% 45% 22% 22% / 28% 28% 16% 16%;
+  box-shadow: inset -2rem -3rem 4rem #030407, inset 1rem 1rem 2rem rgb(255 255 255 / .08);
+}
+
+.fallbackTorso i { position: absolute; left: 22%; right: 22%; top: 32%; height: 1px; background: linear-gradient(90deg, transparent, #2d62ff, transparent); }
+.fallbackArm { z-index: 1; top: 35%; width: 24%; height: 48%; border-radius: 999px; }
+.fallbackArmLeft { left: 0; transform: rotate(12deg); }
+.fallbackArmRight { right: 0; transform: rotate(-12deg); }
+
+.fallbackSignal {
+  position: absolute;
+  right: 12%;
+  bottom: 15%;
+  color: #9fb4ff;
+  font: 600 .65rem/1 var(--font-mono);
+  letter-spacing: .16em;
+}
+
+[data-robot-stage^="service-"] .robotViewport { transform: translate3d(3vw, calc((var(--robot-stage-progress) - .5) * -2.5rem), 0) scale(.88); }
+[data-robot-stage="projects"] .robotViewport { opacity: .42; transform: translate3d(-42vw, 5vh, 0) scale(.66); }
+[data-robot-stage="projects"] .splineMount { pointer-events: none; }
+[data-robot-stage="pricing"] .robotViewport { opacity: .09; transform: translate3d(18vw, 8vh, 0) scale(.52); }
+[data-robot-stage="pricing"] .splineMount { pointer-events: none; }
+[data-robot-stage="process"] .robotViewport { opacity: .16; transform: translate3d(18vw, 4vh, 0) scale(.64); }
+[data-robot-stage="process"] .splineMount { pointer-events: none; }
+[data-robot-stage="faq"] .robotViewport { opacity: 0; transform: translate3d(20vw, 0, 0) scale(.55); }
+[data-robot-stage="faq"] .splineMount { pointer-events: none; }
+[data-robot-stage="final"] .robotViewport { opacity: 1; transform: translate3d(2vw, 2vh, 0) scale(.94); }
+
+@media (max-width: 999px) {
+  .robotViewport {
+    top: auto;
+    right: -15vw;
+    bottom: 0;
+    width: 95vw;
+    height: 66svh;
+    transform: none;
+    mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 88%, transparent 100%);
   }
 
-  .orbit {
-    width: min(76vw, 24rem);
-    border-width: .72rem;
-  }
+  .splineMount { pointer-events: none; }
+  .fallbackFigure { width: min(47%, 20rem); }
+  [data-robot-stage^="service-"] .robotViewport,
+  [data-robot-stage="projects"] .robotViewport,
+  [data-robot-stage="pricing"] .robotViewport,
+  [data-robot-stage="process"] .robotViewport,
+  [data-robot-stage="faq"] .robotViewport { opacity: 0; transform: translate3d(16vw, 8vh, 0) scale(.7); }
+  [data-robot-stage="final"] .robotViewport { right: -20vw; opacity: .72; transform: none; }
+}
+
+@media (max-width: 520px) {
+  .robotViewport { right: -23vw; width: 118vw; height: 61svh; }
+  .fallbackFigure { width: min(44%, 16rem); }
+  .fallbackGrid { background-size: 2.3rem 2.3rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .poster { transition: none; }
+  .intro { display: none; }
+  .robotViewport,
+  .splineMount,
+  .robotFallback { transition: none; }
 }

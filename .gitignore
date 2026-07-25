@@ -16,6 +16,7 @@
 /test-results/
 /qa/screenshots/
 /qa/lighthouse/
+/qa/robot-transformation/
 
 # next.js
 /.next/

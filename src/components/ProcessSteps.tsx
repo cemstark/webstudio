@@ -1,8 +1,8 @@
 export const processSteps = [
   { number: "01", title: "Keşif", text: "Hedefi, kullanıcıyı ve doğru kapsamı netleştiririz." },
-  { number: "02", title: "Yön", text: "İçerik yapısını ve görsel yaklaşımı görünür hale getiririz." },
-  { number: "03", title: "Üretim", text: "Tasarım ve geliştirmeyi aynı karar çizgisinde ilerletiriz." },
-  { number: "04", title: "Yayın", text: "Kalite kontrollerini tamamlar, ürünü yayına hazırlarız." },
+  { number: "02", title: "Tasarım", text: "İçerik yapısını, UX kararlarını ve görsel yönü görünür hale getiririz." },
+  { number: "03", title: "Geliştirme", text: "Onaylanan sistemi performanslı ve erişilebilir bir ürüne dönüştürürüz." },
+  { number: "04", title: "Test & Yayın", text: "Kalite kontrollerini tamamlar, ürünü yayına hazırlarız." },
 ] as const;
 
 export function ProcessSteps() {

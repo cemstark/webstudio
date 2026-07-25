@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { detectBaselineExperienceProfile, detectExperienceProfile, type ExperienceProfile } from "@/lib/webgl";
+import { robotMotion } from "@/lib/motion";
 
 export function useExperienceProfile() {
   const [profile, setProfile] = useState<ExperienceProfile>("none");
@@ -17,21 +18,29 @@ export function useExperienceProfile() {
     const activate = () => {
       if (detectBaselineExperienceProfile() === "candidate") setProfile(detectExperienceProfile());
     };
-    const intentEvents = ["pointerdown", "touchstart", "wheel"] as const;
+    const intentEvents = ["pointermove", "pointerdown", "touchstart", "wheel"] as const;
 
     updateBaseline();
     reducedMotion.addEventListener("change", updateBaseline);
     finePointer.addEventListener("change", updateBaseline);
     wideViewport.addEventListener("change", updateBaseline);
     intentEvents.forEach((eventName) => window.addEventListener(eventName, activate, { once: true, passive: true }));
-    const timeoutHandle = window.setTimeout(activate, 60_000);
+    let idleHandle: number | null = null;
+    const idleDelayHandle = window.setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        idleHandle = window.requestIdleCallback(activate, { timeout: robotMotion.idleLoadTimeout });
+      } else {
+        activate();
+      }
+    }, robotMotion.idleLoadDelay);
 
     return () => {
       reducedMotion.removeEventListener("change", updateBaseline);
       finePointer.removeEventListener("change", updateBaseline);
       wideViewport.removeEventListener("change", updateBaseline);
       intentEvents.forEach((eventName) => window.removeEventListener(eventName, activate));
-      window.clearTimeout(timeoutHandle);
+      window.clearTimeout(idleDelayHandle);
+      if (idleHandle !== null && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
     };
   }, []);
 

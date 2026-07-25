@@ -4,6 +4,7 @@ import { ExperienceIntro } from "@/components/experience/ExperienceIntro";
 import { ExperienceShell } from "@/components/experience/ExperienceShell";
 import { FaqList } from "@/components/FaqList";
 import { ProcessSteps } from "@/components/ProcessSteps";
+import { serviceInstruments, serviceStageBySlug } from "@/content/experience";
 import { homeFaqs } from "@/content/faqs";
 import { featuredProjects } from "@/content/projects";
 import { commerceOffers, formatPrice, providerCostNote, webOffers } from "@/content/pricing";
@@ -32,70 +33,91 @@ export default function Home() {
       <ExperienceShell />
       <div className={styles.scrollRail} aria-hidden="true"><span /></div>
 
-      <section className={styles.hero} data-experience-stage="hero" data-header-theme="dark">
+      <section className={styles.hero} data-robot-stage="hero" data-header-theme="dark">
         <div className={`container ${styles.heroInner}`}>
-          <p className={`${styles.kicker} micro`}>SOLO DİJİTAL STÜDYO · İZMİT</p>
-          <h1 className={styles.heroTitle}>
-            <span>Cesur fikirler.</span>
-            <span>Çalışan dijital</span>
-            <span>deneyimler.</span>
-          </h1>
-          <div className={styles.heroBottom}>
-            <p>Strateji, tasarım, motion ve geliştirmeyi aynı masada buluşturan web deneyimleri.</p>
-            <Link className={styles.roundLink} href="/iletisim"><span>Projenizi</span><span>konuşalım ↗</span></Link>
+          <div className={styles.heroCopy}>
+            <p className={`${styles.kicker} micro`}>cem//guide · etkileşimli 3D deneyim</p>
+            <h1 className={styles.heroTitle}>
+              <span>Cesur fikirler.</span>
+              <span>Çalışan dijital deneyimler.</span>
+            </h1>
+            <p className={styles.heroLead}>
+              Web tasarım, SEO, mobil uygulama ve e-ticareti stratejiyle aynı üretim çizgisinde buluşturuyorum.
+            </p>
+            <div className={styles.heroActions}>
+              <Link className={styles.primaryCta} href="/iletisim">Projenizi konuşalım <span aria-hidden="true">↗</span></Link>
+              <Link className={styles.secondaryCta} href="#secili-projeler">Çalışmaları keşfet <span aria-hidden="true">↓</span></Link>
+            </div>
           </div>
+          <div className={styles.heroGuide} aria-hidden="true">
+            <span>01</span><i /><p>Dijital üretim rehberi</p>
+          </div>
+          <p className={`${styles.pointerHint} micro`}>ROBOTU İNCELEMEK İÇİN HAREKET ETTİRİN</p>
           <p className={`${styles.scrollCue} micro`}>KEŞFETMEK İÇİN KAYDIR <span aria-hidden="true">↓</span></p>
         </div>
       </section>
 
-      <section className={styles.manifesto} data-experience-stage="manifesto" data-header-theme="light">
+      <section className={styles.manifesto} data-header-theme="light">
         <div className="container">
           <p className="eyebrow" data-reveal>YAKLAŞIM</p>
           <p className={styles.manifestoText} data-reveal>
-            Cesur fikirleri; net strateji, güçlü görsel dil ve sağlam teknolojiyle çalışan dijital ürünlere dönüştürüyorum.
+            Fikri yalnızca iyi görünen değil, iyi çalışan bir dijital sisteme dönüştürüyorum.
           </p>
           <div className={styles.manifestoNotes} data-reveal>
-            <p>Tek bir estetik kalıba değil, markanızın hedeflerine göre şekillenen özgün deneyimler.</p>
-            <p>Tasarım ve geliştirme aynı karar çizgisinde ilerler; hız, erişilebilirlik ve işlev hareketin gerisinde kalmaz.</p>
+            <p>Strateji, tasarım, motion ve teknoloji aynı hedefe bakar.</p>
+            <p>Doğrudan Cem ile çalışır; karar, tasarım ve geliştirme arasında kaybolmazsınız.</p>
           </div>
         </div>
       </section>
 
-      <section className={styles.services} data-experience-stage="services" data-header-theme="light">
-        <div className="container">
-          <div className={styles.sectionIntro} data-reveal>
-            <p className="eyebrow">DÖRT DİSİPLİN</p>
-            <h2>Tek bir dijital sistem.</h2>
-            <p>İhtiyacınız kadar teknoloji, hedefiniz kadar netlik.</p>
-          </div>
-          <div className={styles.serviceChapters}>
-            {services.map((service, index) => (
-              <article className={styles.serviceChapter} key={service.slug} data-reveal>
-                <p className="micro">0{index + 1}</p>
-                <div>
+      <section className={styles.servicesLab} data-header-theme="light">
+        <div className={`container ${styles.labIntro}`} data-reveal>
+          <p className="eyebrow">HİZMET LABORATUVARI · 04 DİSİPLİN</p>
+          <h2>Bir hedef. Dört üretim modu.</h2>
+          <p>Kaydırdıkça odak değişir; içerik ve bağlantılar her zaman gerçek DOM akışında kalır.</p>
+        </div>
+
+        <div className={styles.serviceChapters}>
+          {services.map((service, index) => (
+            <article
+              className={styles.serviceChapter}
+              key={service.slug}
+              data-robot-stage={serviceStageBySlug[service.slug]}
+              data-service={service.slug}
+            >
+              <div className={`container ${styles.chapterInner}`}>
+                <div className={styles.chapterCopy} data-reveal>
+                  <p className={`${styles.chapterNumber} micro`}>0{index + 1} / 04</p>
                   <h3>{service.shortTitle}</h3>
-                  <p>{service.summary}</p>
-                </div>
-                <div className={styles.chapterAction}>
-                  <p>{service.priceSignal}</p>
+                  <p className={styles.chapterPromise}>{service.promise}</p>
+                  <p className={styles.chapterSummary}>{service.summary}</p>
+                  <p className={styles.priceSignal}>{service.priceSignal}</p>
                   <Link className="textLink" href={`/hizmetler/${service.slug}`}>Kapsamı keşfet <span aria-hidden="true">↗</span></Link>
                 </div>
-              </article>
-            ))}
-          </div>
+                <div className={styles.serviceInstrument} data-instrument={service.slug} aria-hidden="true">
+                  <span className={styles.instrumentIndex}>CW / 0{index + 1}</span>
+                  <span className={styles.instrumentOrbit}><i /><i /><i /></span>
+                  {serviceInstruments[service.slug].map((label, labelIndex) => (
+                    <span className={styles.instrumentLabel} data-index={labelIndex} key={label}>{label}</span>
+                  ))}
+                </div>
+                <span className={styles.mobileGuideMark} aria-hidden="true"><i />C/W</span>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className={styles.projects} data-experience-stage="projects" data-header-theme="dark">
+      <section id="secili-projeler" className={styles.projects} data-robot-stage="projects" data-header-theme="dark">
         <div className="container">
           <div className={styles.projectsHeading} data-reveal>
-            <p className="eyebrow">SEÇİLİ PROJELER</p>
+            <p className="eyebrow">SEÇİLİ PROJE PORTALI</p>
             <h2>İş konuşsun.</h2>
             <Link className={styles.lightLink} href="/projeler">Tüm proje arşivi ↗</Link>
           </div>
           <article className={styles.featuredProject} data-reveal>
             <Link className={styles.velaVisual} href={`/projeler/${vela.slug}`} aria-label="Vela Windsurfing proje detayını gör">
-              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 900px) 88vw, 100vw" priority /> : null}
+              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1100px) 72vw, (min-width: 700px) 86vw, 100vw" priority /> : null}
               <span>Projeyi gör ↗</span>
             </Link>
             <div className={styles.projectInfo}>
@@ -118,12 +140,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.pricing} data-experience-stage="pricing" data-header-theme="light">
+      <section className={styles.pricing} data-robot-stage="pricing" data-header-theme="light">
         <div className="container">
           <div className={styles.sectionIntro} data-reveal>
-            <p className="eyebrow">FİYAT SİNYALİ</p>
-            <h2>Önce çerçeveyi görün.</h2>
-            <p>Fiyatlar hizmet bedelidir. Kapsam büyüdükçe neyin değiştiğini açıkça karşılaştırın.</p>
+            <p className="eyebrow">FİYAT KONTROL PANELİ</p>
+            <h2>Kapsamı baştan görün.</h2>
+            <p>Rakamlar hizmet bedelidir. İki ana üretim alanını okunaklı ve doğrudan karşılaştırın.</p>
           </div>
           <div className={styles.priceSignals}>
             <article data-reveal>
@@ -144,10 +166,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.process} data-header-theme="light">
+      <section className={styles.process} data-robot-stage="process" data-header-theme="light">
         <div className="container">
-          <div className={styles.sectionIntro} data-reveal><p className="eyebrow">SÜREÇ</p><h2>Dört adım. Tek sorumlu.</h2><p>Belirsizliği azaltan, kararları görünür kılan bir üretim ritmi.</p></div>
-          <div data-reveal><ProcessSteps /></div>
+          <div className={styles.sectionIntro} data-reveal><p className="eyebrow">ÜRETİM HATTI</p><h2>Dört adım. Tek sorumlu.</h2><p>Keşiften yayına kadar aynı karar çizgisi; doğrudan Cem ile çalışma.</p></div>
+          <div className={styles.processLine} data-reveal><span aria-hidden="true" /><ProcessSteps /></div>
           <div className={styles.solo} data-reveal>
             <p className="micro">SOLO STÜDYO</p>
             <p>Projeyi konuştuğunuz kişi, onu tasarlar ve geliştirir.</p>
@@ -157,16 +179,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.faq} data-header-theme="light">
+      <section className={styles.faq} data-robot-stage="faq" data-header-theme="light">
         <div className="container">
           <div className={styles.sectionIntro} data-reveal><p className="eyebrow">KISA SSS</p><h2>Başlamadan önce netleşsin.</h2></div>
           <div data-reveal><FaqList faqs={homeFaqs} includeSchema /></div>
         </div>
       </section>
 
-      <section className={styles.final} data-experience-stage="final" data-header-theme="dark">
+      <section className={styles.final} data-robot-stage="final" data-header-theme="dark">
         <div className={`container ${styles.finalInner}`}>
-          <p className="eyebrow">YENİ PROJE</p>
+          <p className="eyebrow">YENİ PROJE · cem//guide</p>
           <h2>Birlikte bir şey üretelim.</h2>
           <p>İlk adım, hedefinizi açıkça konuşmak.</p>
           <Link className={styles.finalLink} href="/iletisim">Projenizi başlatın <span aria-hidden="true">↗</span></Link>

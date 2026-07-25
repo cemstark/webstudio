@@ -16,7 +16,7 @@ export function ExperienceIntro() {
     const overlay = overlayRef.current;
     window.sessionStorage.setItem(sessionKey, "true");
     overlay?.classList.add(styles.introPlaying);
-    const timer = window.setTimeout(() => overlay?.classList.remove(styles.introPlaying), 1100);
+    const timer = window.setTimeout(() => overlay?.classList.remove(styles.introPlaying), 900);
     return () => window.clearTimeout(timer);
   }, []);
 

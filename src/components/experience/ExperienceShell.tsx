@@ -1,68 +1,95 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { RobotStage } from "@/content/experience";
 import { useExperienceProfile } from "@/hooks/useExperienceProfile";
+import { robotMotion } from "@/lib/motion";
+import { RobotFallback } from "./RobotFallback";
+import { RobotStoryController } from "./RobotStoryController";
 import styles from "./experience.module.css";
 
-type SignatureSceneProps = {
+type RobotSceneProps = {
   active: boolean;
-  onContextLost: () => void;
+  onError: () => void;
+  onReady: () => void;
 };
+
+const activeSceneStages = new Set<RobotStage>([
+  "hero",
+  "service-web",
+  "service-seo",
+  "service-mobile",
+  "service-commerce",
+  "projects",
+  "process",
+  "final",
+]);
 
 export function ExperienceShell() {
   const rootRef = useRef<HTMLDivElement>(null);
   const { profile, setProfile } = useExperienceProfile();
-  const [Scene, setScene] = useState<ComponentType<SignatureSceneProps> | null>(null);
-  const [active, setActive] = useState(true);
+  const [Scene, setScene] = useState<ComponentType<RobotSceneProps> | null>(null);
+  const [sceneStatus, setSceneStatus] = useState<"poster" | "loading" | "ready" | "failed">("poster");
+  const [stage, setStage] = useState<RobotStage>("hero");
+  const [pageVisible, setPageVisible] = useState(true);
+
+  const failScene = useCallback(() => {
+    setSceneStatus("failed");
+    setProfile("none");
+  }, [setProfile]);
+
+  const handleStageChange = useCallback((nextStage: RobotStage) => setStage(nextStage), []);
 
   useEffect(() => {
     if (profile !== "full" || Scene) return;
     let cancelled = false;
-    void import("./SignatureCanvas").then((module) => {
-      if (!cancelled) setScene(() => module.SignatureCanvas);
-    }).catch(() => setProfile("none"));
+    void import("./SplineRobotScene").then((module) => {
+      if (!cancelled) {
+        setSceneStatus("loading");
+        setScene(() => module.SplineRobotScene);
+      }
+    }).catch(failScene);
 
     return () => {
       cancelled = true;
     };
-  }, [profile, Scene, setProfile]);
+  }, [profile, Scene, failScene]);
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    let inViewport = true;
-    let pageVisible = document.visibilityState === "visible";
-    const sync = () => setActive(inViewport && pageVisible);
-    const observer = new IntersectionObserver(([entry]) => {
-      inViewport = entry?.isIntersecting ?? false;
-      sync();
-    }, { rootMargin: "100px" });
-    const onVisibility = () => {
-      pageVisible = document.visibilityState === "visible";
-      sync();
-    };
-
-    observer.observe(root);
+    const onVisibility = () => setPageVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
+  useEffect(() => {
+    if (profile !== "full" || sceneStatus === "ready" || sceneStatus === "failed") return;
+    const timeout = window.setTimeout(failScene, robotMotion.sceneLoadTimeout);
+    return () => window.clearTimeout(timeout);
+  }, [profile, sceneStatus, failScene]);
+
+  const active = pageVisible && activeSceneStages.has(stage);
+
   return (
-    <div ref={rootRef} className={styles.experienceLayer} data-experience-profile={profile} aria-hidden="true">
-      <div className={styles.poster}>
-        <span className={`${styles.orbit} ${styles.orbitOne}`} />
-        <span className={`${styles.orbit} ${styles.orbitTwo}`} />
-        <span className={`${styles.orbit} ${styles.orbitThree}`} />
-        <span className={`${styles.orbit} ${styles.orbitFour}`} />
+    <div
+      ref={rootRef}
+      className={styles.experienceLayer}
+      data-experience-profile={profile}
+      data-robot-stage="hero"
+      data-scene-status={sceneStatus}
+      aria-hidden="true"
+    >
+      <RobotStoryController hostRef={rootRef} onStageChange={handleStageChange} />
+      <div className={styles.robotViewport}>
+        <RobotFallback />
+        {profile === "full" && Scene ? (
+          <Scene
+            active={active}
+            onError={failScene}
+            onReady={() => setSceneStatus("ready")}
+          />
+        ) : null}
       </div>
-      {profile === "full" && Scene ? (
-        <Scene active={active} onContextLost={() => setProfile("none")} />
-      ) : null}
     </div>
   );
 }

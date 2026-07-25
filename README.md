@@ -2,27 +2,41 @@
 
 Cem Yıldız tarafından yürütülen solo dijital stüdyo için Next.js 16 App Router, React 19 ve strict TypeScript tabanlı çok sayfalı portfolyo uygulaması.
 
-## Deneyim mimarisi
+## Robot deneyimi mimarisi
 
-Ana sayfa, semantik ve server-rendered içeriğin üzerinde çalışan küçük client adalarıyla zenginleştirilir:
+Ana sayfa, semantik ve server-rendered içeriğin üzerinde çalışan küçük client adalarıyla zenginleştirilir. H1, hizmetler, fiyatlar, Vela projesi, süreç, SSS ve CTA metinleri canvas dışında gerçek HTML olarak kalır.
 
-- `ExperienceShell`, reduced-motion, Save-Data, pointer, viewport, cihaz belleği ve gerçek WebGL context testinden merkezi bir `full` / `lite` / `none` profili üretir.
-- `SignatureCanvas` yalnızca `full` profilinde, ilk kullanıcı niyeti veya boşta kalma sonrasında dinamik import edilir. `three` ve `@react-three/fiber` ile dış model veya texture kullanmadan dört procedural C–W yörünge parçası üretir.
-- Sahne hedefleri `src/lib/motion.ts` içinde tek yerde tanımlıdır. Scroll konumu parçaları monogram, dört disiplin, proje portalı ve final imzası arasında dönüştürür.
-- `lite` ve `none` profilleri CSS imza kompozisyonuna düşer. İçerik ve CTA’lar canvas’tan bağımsız DOM öğeleridir.
-- İç sayfalar Three.js chunk’ını yüklemez; Server Component yapısı, metadata ve structured data korunur.
+- `ExperienceShell`, `full` / `lite` / `none` profilini, lazy import durumunu, görünürlüğü, scene timeout’unu ve fallback geçişini yönetir.
+- `SplineRobotScene`, yalnız Spline adapter’ıdır. `Application` typed ref’iyle resmî `play()` / `stop()` yaşam döngüsünü ve varsayılan açık `renderOnDemand` davranışını kullanır.
+- `RobotStoryController`, stable `data-robot-stage` chapter’larını viewport merkezinden izler. Scroll başına React render’ı üretmez; tek `requestAnimationFrame`, `ResizeObserver`, DOM dataset’i ve CSS custom property kullanır.
+- `RobotFallback`, Spline sahnesinden kopyalanmış bir görsel değildir. CSS ile üretilmiş özgün, markalı bir teknoloji siluetidir; ilk HTML’de alanı ayırır ve scene hatasında görünür kalır.
+- Spline scene URL’sinin tek kaynağı `src/content/experience.ts` dosyasındaki `SPLINE_ROBOT_SCENE_URL` sabitidir.
 
-`three`, procedural WebGL sahnesi için; `@react-three/fiber`, React yaşam döngüsüyle güvenli kaynak yönetimi için kullanılır. `@playwright/test`, production browser smoke, erişilebilir etkileşim ve responsive görsel QA içindir. GSAP, Lenis, Drei, post-processing ve harici 3D model eklenmemiştir.
+Robot, chatbot veya yapay zekâ asistanı olarak sunulmaz; `cem//guide` stüdyonun etkileşimli 3D görsel rehberidir.
 
-## Progressive enhancement
+## Spline kaynağı ve bağımlılıklar
 
-- `full`: geniş viewport, fine pointer, reduced-motion/Save-Data kapalı ve başarılı WebGL testi; R3F sahnesi ve hafif pointer tepkisi çalışır.
-- `lite`: touch/coarse pointer veya dar ekran; native scroll ve statik CSS imza kompozisyonu kullanılır.
-- `none`: reduced-motion, Save-Data veya WebGL hatası; preloader, parallax, route wipe ve canvas devre dışıdır.
+Kullanılan robot sahnesi kullanıcı tarafından sağlanmış üçüncü taraf Spline production kaynağıdır:
 
-Sekme arka plandayken veya deneyim viewport dışındayken render döngüsü durur. DPR 1–1.5 ile sınırlıdır. WebGL context kaybında sahne CSS fallback’e geçer. Vela görseli AVIF/WebP olarak saklanır ve `next/image` ile sabit oran/sizes bilgisi üzerinden sunulur.
+`https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode`
 
-## Yerel geliştirme
+Sahnenin yeniden dağıtım/self-host lisans hakkı bağımsız olarak doğrulanamadığı için `.splinecode` repoya kopyalanmamış, remote production URL korunmuştur. Bu seçim dış ağ/CORS erişimine bağımlılık getirir; timeout, error boundary ve CSS fallback bu sınırı karşılar. Spline attribution/watermark kaldırılmamıştır.
+
+- `@splinetool/react-spline`: React client adapter’ı ve scene yaşam döngüsü.
+- `@splinetool/runtime`: typed `Application`, WebGL runtime ve on-demand render.
+- `@playwright/test`: production browser smoke, fallback, erişilebilir etkileşim ve responsive görsel QA.
+
+Eski `three`, `@react-three/fiber` ve `@types/three` bağımlılıkları kaldırılmıştır. Ana sayfada tek Spline instance/canvas vardır; iç rotalar Spline scene isteği yapmaz. Framer Motion, GSAP, Lenis, Tailwind, shadcn, Spotlight ve ikinci bir WebGL runtime eklenmemiştir.
+
+## Full / Lite / None
+
+- `full`: geniş viewport, fine pointer, reduced-motion/Save-Data kapalı, yeterli cihaz belleği ve başarılı WebGL testi. Kritik DOM boyandıktan sonra ilk kullanıcı niyeti veya kısa idle penceresinde tek Spline instance yüklenir. Scroll chapter’ları wrapper konumu, ölçeği, görünürlüğü ve CSS arayüzünü dönüştürür.
+- `lite`: touch/coarse pointer veya dar ekran. Remote scene/runtime yüklenmez; native scroll, CSS robot hero/final kompozisyonu ve hizmetlerde hafif C/W işareti kullanılır.
+- `none`: reduced-motion, Save-Data, WebGL/context veya scene yükleme hatası. Spline isteği/canvas yoktur; intro, scrub ve büyük hareketler kapalıdır, bütün içerik görünürdür.
+
+Sekme görünür değilken ve robotun gerekmediği chapter’larda desteklenen resmî `stop()` yöntemiyle render durdurulur. Scene başarısız olursa aynı oturumda sonsuz yeniden yükleme yapılmaz. Vela görseli Spline dokusuna taşınmaz; `next/image`, sabit oran ve responsive `sizes` ile sunulur.
+
+## Yerel geliştirme ve kalite kapısı
 
 Gereksinim: Node.js 22.x ve npm 10+.
 
@@ -32,8 +46,6 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Kalite kapısı:
-
 ```bash
 npm run lint
 npm run typecheck
@@ -41,7 +53,9 @@ npm test
 npm run build
 npm run test:smoke
 npm run test:e2e
+npm run qa:screenshots
 npm run qa:lighthouse
+npm audit
 ```
 
 Playwright Chromium ilk kullanımda gerekiyorsa:
@@ -50,13 +64,7 @@ Playwright Chromium ilk kullanımda gerekiyorsa:
 npx playwright install chromium
 ```
 
-Responsive QA ekran görüntüleri üretmek için production build sonrasında:
-
-```bash
-npm run qa:screenshots
-```
-
-Ekran görüntüleri `qa/screenshots/<viewport>/`, Lighthouse JSON raporları `qa/lighthouse/` altına yazılır ve Git tarafından izlenmez. Lighthouse komutu production server’ı geçici olarak başlatır ve ana sayfa ile fiyatlandırmayı ölçer.
+Robot dönüşümü için responsive QA çıktıları `qa/robot-transformation/after/<viewport>/` altında üretilir. Suite 390×844, 768×1024, 1440×900 ve 1920×1080 boyutlarında hero, dört hizmet, Vela, fiyat, süreç, final CTA, açık menü, reduced-motion ve engellenmiş Spline fallback karelerini üretir. Dizin Git tarafından izlenmez. Lighthouse JSON raporları `qa/lighthouse/` altında tutulur.
 
 ## Environment variables
 
@@ -72,14 +80,14 @@ SMTP değişkenleri eksikse iletişim API’si kontrollü olarak `503` döndür�
 2. GitHub repository olarak `cemstark/webstudio`, dal olarak `main` bağlayın.
 3. Framework: **Next.js**; install: `npm ci`; build: `npm run build`; start: `npm run start`; output: `.next`.
 4. Node.js sürümünü **22.x** seçin.
-5. `.env.example` içindeki değerleri Hostinger **Environment Variables** alanına gerçek değerleriyle ekleyin.
-6. Deploy loglarını, ana rotaları ve yapılandırılmış SMTP ile iletişim formunu geçici domain üzerinde doğrulayın; ardından gerçek domaini bağlayın.
+5. `.env.example` değerlerini Hostinger **Environment Variables** alanına gerçek değerleriyle ekleyin.
+6. Deploy loglarını, ana rotaları, remote Spline erişimini/fallback’i ve yapılandırılmış SMTP ile iletişim formunu geçici domain üzerinde doğrulayın.
 
-Her `main` push’u otomatik deploy tetikleyebileceğinden production build ve smoke test push öncesinde yerelde çalıştırılmalıdır.
+Yeni zorunlu environment variable yoktur. `main` push’u otomatik deploy tetikleyebileceğinden production build, smoke ve E2E push öncesinde çalıştırılmalıdır.
 
-## İçerik ve varlık notları
+## İçerik gerçekleri
 
 - Fiyatların tek kaynağı `src/content/pricing.ts` dosyasıdır.
 - Vela Windsurfing ilk öne çıkan gerçek projedir; canlı URL ve gerçek yayın görseli korunur.
-- AysaWorks, BlueKim, DRNEKİNOTO SERVİS, cemwebstudio, ATLAS PANEL SCRIPT ve DRN Servis Paneli için doğrulanmış vaka metni ve proje görselleri sağlanana kadar arşiv/procedural kapak kullanılır; sonuç veya metrik uydurulmaz.
-- Ana sayfa, hizmet merkezi ve dört hizmet detayı, fiyatlandırma, proje listesi ve statik üretilen dinamik vaka sayfaları, süreç, hakkımda, iletişim, gizlilik ve çerez politikası gerçek App Router rotalarıdır.
+- Eksik arşiv projeleri doğrulanmış vaka metni/görseli gelene kadar procedural kapak ve “İçerik hazırlanıyor” durumuyla sunulur; sonuç veya metrik uydurulmaz.
+- App Router rotaları, SSG proje slug’ları, metadata/JSON-LD, sitemap/robots/manifest, güvenlik header’ları ve iletişim API korumaları ana sayfa deneyiminden bağımsız kalır.

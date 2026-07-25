@@ -16,7 +16,7 @@ export type QuoteOffer = {
 };
 
 export const providerCostNote =
-  "Gösterilen tutar hizmet bedelidir. Alan adı, hosting, premium tema/eklenti lisansları ve projeye bağlı üçüncü taraf sağlayıcı maliyetleri ayrıca hesaplanır ve teklife eklenir.";
+  "Gösterilen tutar hizmet bedelidir. Alan adı, hosting, premium tema/eklenti lisansları, ödeme/kargo/e-posta servisleri ve projeye bağlı diğer üçüncü taraf sağlayıcı maliyetleri ayrıca hesaplanır ve teklife eklenir.";
 
 export const webOffers = [
   { code: "WEB-START", name: "Başlangıç", price: 7000, currency: "TRY", audience: "Hızlı ve ekonomik biçimde yayına çıkmak isteyen içerik odaklı siteler ve bloglar.", approach: ["WordPress tabanlı", "Hazır tema kullanımı"] },
