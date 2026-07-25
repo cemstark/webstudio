@@ -1,15 +1,32 @@
-import { expect, test, type Page } from "@playwright/test";
+import { devices, expect, test, type BrowserContext, type Page } from "@playwright/test";
 
-test.describe.configure({ timeout: 180_000 });
+test.describe.configure({ timeout: 600_000 });
 
-const viewports = [
+const mobileViewports = [
+  { name: "320x568", width: 320, height: 568 },
+  { name: "360x800", width: 360, height: 800 },
+  { name: "375x667", width: 375, height: 667 },
   { name: "390x844", width: 390, height: 844 },
+  { name: "430x932", width: 430, height: 932 },
   { name: "768x1024", width: 768, height: 1024 },
+  { name: "820x1180", width: 820, height: 1180 },
+  { name: "844x390", width: 844, height: 390 },
+  { name: "932x430", width: 932, height: 430 },
+  { name: "1024x768", width: 1024, height: 768 },
+] as const;
+
+const desktopViewports = [
   { name: "1440x900", width: 1440, height: 900 },
   { name: "1920x1080", width: 1920, height: 1080 },
 ] as const;
 
+const viewportFilter = new Set((process.env.QA_VIEWPORTS ?? "").split(",").filter(Boolean));
+const selectedMobileViewports = viewportFilter.size
+  ? mobileViewports.filter((viewport) => viewportFilter.has(viewport.name))
+  : mobileViewports;
+
 const stages = [
+  ["manifesto", "manifesto"],
   ["service-web", "service-01-web-tasarim"],
   ["service-seo", "service-02-seo"],
   ["service-mobile", "service-03-mobil-uygulama"],
@@ -17,52 +34,131 @@ const stages = [
   ["projects", "vela-proje-portali"],
   ["pricing", "fiyatlandirma"],
   ["process", "surec"],
+  ["faq", "sss"],
   ["final", "final-cta"],
 ] as const;
 
 async function captureViewport(page: Page, path: string) {
-  await page.waitForTimeout(280);
-  await page.screenshot({ path, animations: "disabled" });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.replace(/\.png$/, ".jpg"), animations: "disabled", quality: 82, type: "jpeg" });
 }
 
-for (const viewport of viewports) {
-  test(`robot story visual QA at ${viewport.name}`, async ({ browser }) => {
-    const directory = `qa/robot-transformation/after/${viewport.name}`;
-    const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
-    const page = await context.newPage();
-    await page.goto("/");
-    if (viewport.width >= 1000) {
-      await page.mouse.wheel(0, 1);
-      await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "ready", { timeout: 20_000 });
-      await page.waitForTimeout(750);
+async function positionStage(page: Page, stage: string, block: "start" | "center") {
+  const section = page.locator(`[data-robot-stage="${stage}"]:not([data-experience-profile])`);
+  await section.evaluate((element, requestedBlock) => {
+    const rect = element.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const offset = requestedBlock === "center" ? (rect.height - window.innerHeight) / 2 : 1;
+    window.scrollTo(0, Math.max(0, absoluteTop + offset));
+    window.dispatchEvent(new Event("scroll"));
+  }, block);
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-robot-stage", stage);
+}
+
+async function captureStory(page: Page, directory: string, includeServiceMids = true) {
+  await page.evaluate(() => { document.documentElement.style.scrollBehavior = "auto"; });
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await captureViewport(page, `${directory}/hero.png`);
+  for (const [stage, filename] of stages) {
+    await positionStage(page, stage, "start");
+    await captureViewport(page, `${directory}/${filename}-start.png`);
+    if (includeServiceMids && stage.startsWith("service-")) {
+      await positionStage(page, stage, "center");
+      await captureViewport(page, `${directory}/${filename}-mid.png`);
     }
-    await captureViewport(page, `${directory}/hero.png`);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.getByRole("button", { name: "Menüyü aç" }).click();
+  await captureViewport(page, `${directory}/menu-open.png`);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Site menüsü" })).toBeHidden();
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
+}
 
-    for (const [stage, filename] of stages) {
-      await page.locator(`[data-robot-stage="${stage}"]:not([data-experience-profile])`).evaluate((element) => element.scrollIntoView({ block: "start" }));
-      await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-robot-stage", stage);
-      await captureViewport(page, `${directory}/${filename}.png`);
-    }
+async function waitForProductionScene(page: Page) {
+  await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "full", { timeout: 15_000 });
+  await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "ready", { timeout: 30_000 });
+  await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
+}
 
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.getByRole("button", { name: "Menüyü aç" }).click();
-    await captureViewport(page, `${directory}/menu-open.png`);
-    await context.close();
+test("real production Spline mobile and tablet visual matrix", async ({ browser }) => {
+  const first = mobileViewports[3];
+  const context = await browser.newContext({
+    ...devices["iPhone 13"],
+    reducedMotion: "no-preference",
+    viewport: { width: first.width, height: first.height },
+  });
+  const sceneRequests: string[] = [];
+  context.on("request", (request) => {
+    if (request.url().includes("/scene.splinecode")) sceneRequests.push(request.url());
+  });
+  const page = await context.newPage();
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await waitForProductionScene(page);
 
-    const reducedContext = await browser.newContext({ reducedMotion: "reduce", viewport: { width: viewport.width, height: viewport.height } });
-    const reducedPage = await reducedContext.newPage();
-    await reducedPage.goto("/");
-    await expect(reducedPage.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "none");
-    await captureViewport(reducedPage, `${directory}/reduced-motion.png`);
+  for (const viewport of selectedMobileViewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await captureStory(page, `qa/screenshots/step-1b/after/mobile-full/${viewport.name}`);
+    await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
+  }
+  expect(sceneRequests).toHaveLength(1);
+  await context.close();
+});
+
+test("real production Spline desktop regression matrix", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: desktopViewports[0] });
+  const sceneRequests: string[] = [];
+  context.on("request", (request) => {
+    if (request.url().includes("/scene.splinecode")) sceneRequests.push(request.url());
+  });
+  const page = await context.newPage();
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await waitForProductionScene(page);
+
+  for (const viewport of desktopViewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await captureStory(page, `qa/screenshots/step-1b/after/desktop-full/${viewport.name}`, false);
+    await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
+  }
+  expect(sceneRequests).toHaveLength(1);
+  await context.close();
+});
+
+async function captureFallbackMode(context: BrowserContext, mode: string, viewport: { name: string; width: number; height: number }) {
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.evaluate(() => { document.documentElement.style.scrollBehavior = "auto"; });
+  await expect(page.locator("[data-robot-fallback]")).toBeVisible();
+  const directory = `qa/screenshots/step-1b/after/${mode}/${viewport.name}`;
+  await captureViewport(page, `${directory}/hero.png`);
+  for (const [stage, filename] of [["service-web", "service-01-web-tasarim"], ["final", "final-cta"]] as const) {
+    await positionStage(page, stage, stage === "final" ? "start" : "center");
+    await captureViewport(page, `${directory}/${filename}.png`);
+  }
+  await page.close();
+}
+
+for (const viewport of [mobileViewports[3], mobileViewports[5], desktopViewports[0]]) {
+  test(`lite, reduced and blocked visual comparison at ${viewport.name}`, async ({ browser }) => {
+    const baseOptions = { ...devices["iPhone 13"], viewport: { width: viewport.width, height: viewport.height } };
+
+    const liteContext = await browser.newContext({ ...baseOptions, reducedMotion: "no-preference" });
+    await liteContext.addInitScript(() => Object.defineProperty(navigator, "deviceMemory", { configurable: true, value: 2 }));
+    await captureFallbackMode(liteContext, "mobile-lite", viewport);
+    await liteContext.close();
+
+    const reducedContext = await browser.newContext({ ...baseOptions, reducedMotion: "reduce" });
+    await captureFallbackMode(reducedContext, "motion-disabled", viewport);
     await reducedContext.close();
 
-    const blockedContext = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
+    const blockedContext = await browser.newContext({ ...baseOptions, reducedMotion: "no-preference" });
     await blockedContext.route("**/scene.splinecode", (route) => route.abort("failed"));
     const blockedPage = await blockedContext.newPage();
     await blockedPage.goto("/");
-    if (viewport.width >= 1000) await blockedPage.mouse.wheel(0, 1);
-    await expect(blockedPage.locator("[data-robot-fallback]")).toBeVisible();
-    await captureViewport(blockedPage, `${directory}/spline-blocked-fallback.png`);
+    await expect(blockedPage.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "none", { timeout: 15_000 });
+    await captureViewport(blockedPage, `qa/screenshots/step-1b/after/scene-blocked/${viewport.name}/hero.png`);
     await blockedContext.close();
   });
 }

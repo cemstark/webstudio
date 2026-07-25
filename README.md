@@ -30,9 +30,11 @@ Eski `three`, `@react-three/fiber` ve `@types/three` bağımlılıkları kaldır
 
 ## Full / Lite / None
 
-- `full`: geniş viewport, fine pointer, reduced-motion/Save-Data kapalı, yeterli cihaz belleği ve başarılı WebGL testi. Kritik DOM boyandıktan sonra ilk kullanıcı niyeti veya kısa idle penceresinde tek Spline instance yüklenir. Scroll chapter’ları wrapper konumu, ölçeği, görünürlüğü ve CSS arayüzünü dönüştürür.
-- `lite`: touch/coarse pointer veya dar ekran. Remote scene/runtime yüklenmez; native scroll, CSS robot hero/final kompozisyonu ve hizmetlerde hafif C/W işareti kullanılır.
-- `none`: reduced-motion, Save-Data, WebGL/context veya scene yükleme hatası. Spline isteği/canvas yoktur; intro, scrub ve büyük hareketler kapalıdır, bütün içerik görünürdür.
+- `full`: reduced-motion ve Save-Data kapalı, WebGL kullanılabilir ve açık bir cihaz/ağ kısıtı yoksa viewport genişliği veya pointer türünden bağımsızdır. Bu nedenle uygun touch telefon ve tablet de gerçek sahneyi alır. Kritik DOM boyandıktan sonra ilk kullanıcı niyeti veya yaklaşık 900 ms idle penceresinde tek Spline instance yüklenir.
+- `lite`: düşük bellek/CPU veya 2G sınıfı ağ gibi ölçülebilir kapasite kısıtlarında seçilir. Remote scene/runtime yüklenmez; CSS robot, hizmetlere özel grid/tarama/telefon/ticaret enstrümanları ve final rehber kompozisyonu korunur.
+- `none`: reduced-motion, Save-Data, WebGL/context kaybı, scene yükleme hatası veya aynı oturumdaki önceki scene hatasında seçilir. Spline isteği/canvas yoktur; bütün içerik ve CTA’lar server-rendered fallback ile görünürdür.
+
+Pointer/hover kabiliyeti yalnız input davranışını belirler; render tier seçmez. Uygulamanın içerik breakpoint’i tek bir `960px` eşiğinde hizalanmıştır; orientation ve 899/900/959/960/961 geçişleri scene’i yeniden mount etmez. Yerel Lighthouse karşılaştırmalarında `?qa-experience=lite` yalnız `localhost`/`127.0.0.1` üzerinde lite profili deterministik olarak zorlar.
 
 Sekme görünür değilken ve robotun gerekmediği chapter’larda desteklenen resmî `stop()` yöntemiyle render durdurulur. Scene başarısız olursa aynı oturumda sonsuz yeniden yükleme yapılmaz. Vela görseli Spline dokusuna taşınmaz; `next/image`, sabit oran ve responsive `sizes` ile sunulur.
 
@@ -64,7 +66,7 @@ Playwright Chromium ilk kullanımda gerekiyorsa:
 npx playwright install chromium
 ```
 
-Robot dönüşümü için responsive QA çıktıları `qa/robot-transformation/after/<viewport>/` altında üretilir. Suite 390×844, 768×1024, 1440×900 ve 1920×1080 boyutlarında hero, dört hizmet, Vela, fiyat, süreç, final CTA, açık menü, reduced-motion ve engellenmiş Spline fallback karelerini üretir. Dizin Git tarafından izlenmez. Lighthouse JSON raporları `qa/lighthouse/` altında tutulur.
+Adım 1B responsive QA çıktıları `qa/screenshots/step-1b/after/<profil>/<viewport>/` altında üretilir. Suite 320×568–1024×768 touch matrisi ile 1440×900 ve 1920×1080 desktop kadrajlarında hero, manifesto, dört hizmetin başlangıç/orta noktaları, Vela, fiyat, süreç, SSS, final CTA ve açık menüyü; ayrıca lite, reduced-motion ve engellenmiş Spline fallback’lerini üretir. Dizin Git tarafından izlenmez. Lighthouse JSON raporları `qa/lighthouse/` altında tutulur; teslim özeti `qa/STEP-1B-MOBILE-ADAPTATION-REPORT.md` dosyasındadır.
 
 ## Environment variables
 

@@ -180,7 +180,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
 .routeTransition.isActive { animation: routeCurtain .58s var(--ease-expressive) both; }
 @keyframes routeCurtain { 0% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
 
-@media (max-width: 900px) {
+/* Layer order: content < robot(2) < home copy(3) < header(100) < route(200) < intro(300). */
+@media (max-width: 960px) {
   .headerInner { min-height: 4.5rem; }
   .menuOverlay { grid-template-columns: 1fr; padding-top: 6rem; }
   .menuAside { display: none; }
@@ -190,8 +191,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
   .pricingGrid { grid-template-columns: 1fr; gap: 1rem; border: 0; }
   .pricingCard { min-height: auto; gap: 3rem; border: 1px solid var(--line); }
   .pricingCard.featuredOffer { transform: none; }
-  .processGrid { grid-template-columns: repeat(2, 1fr); }
-  .processGrid li:nth-child(2) { border-right: 0; }
+  .processGrid { grid-template-columns: 1fr; }
+  .processGrid li { border-right: 0; }
   .processGrid li { border-bottom: 1px solid var(--line); }
   .footerGrid { grid-template-columns: 1.5fr 1fr; }
   .footerGrid > div:last-child { grid-column: 1 / -1; }
@@ -209,7 +210,6 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
   .projectGridEditorial .projectCard:first-child .projectVisual { aspect-ratio: 4 / 3; }
   .serviceCard { min-height: 19rem; }
   .projectMeta { align-items: flex-start; flex-direction: column; gap: .2rem; }
-  .processGrid { grid-template-columns: 1fr; }
   .processGrid li { min-height: auto; border-right: 0; }
   .processGrid h3 { margin-top: 2rem; }
   .footerBottom { flex-direction: column; }

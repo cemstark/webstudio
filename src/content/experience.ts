@@ -5,6 +5,7 @@ export const SPLINE_ROBOT_SCENE_URL =
 
 export const robotStages = [
   "hero",
+  "manifesto",
   "service-web",
   "service-seo",
   "service-mobile",

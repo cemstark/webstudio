@@ -55,11 +55,11 @@
   z-index: 2;
   opacity: 0;
   pointer-events: auto;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   transition: opacity .55s ease;
 }
 
-.splineMount canvas { width: 100% !important; height: 100% !important; touch-action: pan-y; }
+.splineMount canvas { width: 100% !important; height: 100% !important; touch-action: pan-y pinch-zoom; }
 
 [data-scene-status="ready"] .splineMount { opacity: 1; }
 [data-scene-status="ready"] .robotFallback { opacity: 0; }
@@ -171,6 +171,8 @@
 }
 
 [data-robot-stage^="service-"] .robotViewport { transform: translate3d(3vw, calc((var(--robot-stage-progress) - .5) * -2.5rem), 0) scale(.88); }
+[data-robot-stage="manifesto"] .robotViewport { opacity: .13; transform: translate3d(32vw, 6vh, 0) scale(.58); }
+[data-robot-stage="manifesto"] .splineMount { pointer-events: none; }
 [data-robot-stage="projects"] .robotViewport { opacity: .42; transform: translate3d(-42vw, 5vh, 0) scale(.66); }
 [data-robot-stage="projects"] .splineMount { pointer-events: none; }
 [data-robot-stage="pricing"] .robotViewport { opacity: .09; transform: translate3d(18vw, 8vh, 0) scale(.52); }
@@ -181,31 +183,51 @@
 [data-robot-stage="faq"] .splineMount { pointer-events: none; }
 [data-robot-stage="final"] .robotViewport { opacity: 1; transform: translate3d(2vw, 2vh, 0) scale(.94); }
 
-@media (max-width: 999px) {
+@media (max-width: 960px) {
   .robotViewport {
     top: auto;
-    right: -15vw;
+    right: -18vw;
     bottom: 0;
-    width: 95vw;
-    height: 66svh;
+    width: 108vw;
+    height: 60svh;
+    height: 60dvh;
     transform: none;
-    mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 88%, transparent 100%);
+    transform-origin: 68% 72%;
+    mask-image: radial-gradient(ellipse 64% 62% at 68% 68%, #000 45%, transparent 100%);
   }
 
-  .splineMount { pointer-events: none; }
+  [data-input-mode="touch"] .splineMount { pointer-events: none; }
   .fallbackFigure { width: min(47%, 20rem); }
-  [data-robot-stage^="service-"] .robotViewport,
-  [data-robot-stage="projects"] .robotViewport,
-  [data-robot-stage="pricing"] .robotViewport,
-  [data-robot-stage="process"] .robotViewport,
-  [data-robot-stage="faq"] .robotViewport { opacity: 0; transform: translate3d(16vw, 8vh, 0) scale(.7); }
-  [data-robot-stage="final"] .robotViewport { right: -20vw; opacity: .72; transform: none; }
+  [data-robot-stage="manifesto"] .robotViewport { right: -35vw; bottom: 9svh; width: 72vw; height: 34svh; opacity: .11; transform: scale(.72); }
+  [data-robot-stage^="service-"] .robotViewport { right: -35vw; bottom: 1svh; width: 76vw; height: 38svh; opacity: .18; transform: scale(.78); }
+  [data-robot-stage="projects"] .robotViewport { right: -40vw; bottom: 3svh; width: 70vw; height: 34svh; opacity: .08; transform: scale(.72); }
+  [data-robot-stage="pricing"] .robotViewport { right: -38vw; bottom: 5svh; width: 66vw; height: 31svh; opacity: .06; transform: scale(.68); }
+  [data-robot-stage="process"] .robotViewport { right: -34vw; bottom: 5svh; width: 68vw; height: 34svh; opacity: .12; transform: scale(.72); }
+  [data-robot-stage="faq"] .robotViewport { opacity: 0; visibility: hidden; }
+  [data-robot-stage="final"] .robotViewport { right: -28vw; bottom: max(1svh, env(safe-area-inset-bottom)); width: 96vw; height: 57svh; opacity: .78; transform: none; }
+  [data-robot-stage="manifesto"] .robotFallback,
+  [data-robot-stage^="service-"] .robotFallback,
+  [data-robot-stage="projects"] .robotFallback,
+  [data-robot-stage="pricing"] .robotFallback,
+  [data-robot-stage="process"] .robotFallback { background: transparent; }
 }
 
 @media (max-width: 520px) {
-  .robotViewport { right: -23vw; width: 118vw; height: 61svh; }
+  .robotViewport { right: -31vw; width: 124vw; height: 55svh; height: 55dvh; }
   .fallbackFigure { width: min(44%, 16rem); }
   .fallbackGrid { background-size: 2.3rem 2.3rem; }
+  [data-robot-stage="final"] .robotViewport { right: -48vw; bottom: max(-9svh, calc(env(safe-area-inset-bottom) - 9svh)); width: 112vw; height: 52svh; height: 52dvh; }
+}
+
+@media (max-height: 620px) and (max-width: 640px) {
+  .robotViewport { right: -34vw; width: 116vw; height: 46svh; height: 46dvh; }
+  [data-robot-stage="final"] .robotViewport { right: -49vw; bottom: -10svh; height: 48svh; height: 48dvh; }
+}
+
+@media (max-height: 520px) and (min-width: 641px) and (max-width: 960px) {
+  .robotViewport { right: -6vw; width: 58vw; height: 92svh; height: 92dvh; mask-image: radial-gradient(ellipse 67% 78% at 61% 55%, #000 48%, transparent 100%); }
+  [data-robot-stage^="service-"] .robotViewport { right: -18vw; width: 44vw; height: 70svh; height: 70dvh; }
+  [data-robot-stage="final"] .robotViewport { right: -35vw; bottom: -12svh; width: 62vw; height: 96svh; height: 96dvh; }
 }
 
 @media (prefers-reduced-motion: reduce) {

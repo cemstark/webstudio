@@ -1,29 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { detectBaselineExperienceProfile, detectExperienceProfile, type ExperienceProfile } from "@/lib/webgl";
+import { useCallback, useEffect, useState } from "react";
+import {
+  detectBaselineExperienceProfile,
+  detectExperienceInputMode,
+  detectExperienceProfile,
+  rememberSceneFailure,
+  type ExperienceInputMode,
+  type ExperienceProfile,
+} from "@/lib/webgl";
 import { robotMotion } from "@/lib/motion";
 
 export function useExperienceProfile() {
   const [profile, setProfile] = useState<ExperienceProfile>("none");
+  const [inputMode, setInputMode] = useState<ExperienceInputMode>("touch");
+
+  const disableExperience = useCallback(() => {
+    rememberSceneFailure();
+    setProfile("none");
+  }, []);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finePointer = window.matchMedia("(pointer: fine)");
-    const wideViewport = window.matchMedia("(min-width: 900px)");
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    const hover = window.matchMedia("(hover: hover)");
+    let activationStarted = false;
+
     const updateBaseline = () => {
       const baseline = detectBaselineExperienceProfile();
-      setProfile(baseline === "candidate" ? "lite" : baseline);
+      if (baseline !== "candidate") setProfile(baseline);
     };
     const activate = () => {
-      if (detectBaselineExperienceProfile() === "candidate") setProfile(detectExperienceProfile());
+      if (activationStarted || detectBaselineExperienceProfile() !== "candidate") return;
+      activationStarted = true;
+      setProfile(detectExperienceProfile());
     };
-    const intentEvents = ["pointermove", "pointerdown", "touchstart", "wheel"] as const;
+    const updateInputMode = () => setInputMode(detectExperienceInputMode());
+    const intentEvents = ["pointerdown", "touchstart", "wheel"] as const;
 
     updateBaseline();
+    updateInputMode();
     reducedMotion.addEventListener("change", updateBaseline);
-    finePointer.addEventListener("change", updateBaseline);
-    wideViewport.addEventListener("change", updateBaseline);
+    coarsePointer.addEventListener("change", updateInputMode);
+    hover.addEventListener("change", updateInputMode);
     intentEvents.forEach((eventName) => window.addEventListener(eventName, activate, { once: true, passive: true }));
     let idleHandle: number | null = null;
     const idleDelayHandle = window.setTimeout(() => {
@@ -36,13 +55,13 @@ export function useExperienceProfile() {
 
     return () => {
       reducedMotion.removeEventListener("change", updateBaseline);
-      finePointer.removeEventListener("change", updateBaseline);
-      wideViewport.removeEventListener("change", updateBaseline);
+      coarsePointer.removeEventListener("change", updateInputMode);
+      hover.removeEventListener("change", updateInputMode);
       intentEvents.forEach((eventName) => window.removeEventListener(eventName, activate));
       window.clearTimeout(idleDelayHandle);
       if (idleHandle !== null && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
     };
   }, []);
 
-  return { profile, setProfile } as const;
+  return { disableExperience, inputMode, profile } as const;
 }

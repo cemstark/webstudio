@@ -9,7 +9,7 @@ export function ProjectGrid({ items, priorityFirst = false, editorial = false }:
         <article className="projectCard" key={project.slug}>
           <Link className="projectVisual" href={`/projeler/${project.slug}`} aria-label={`${project.name} projesini gör`}>
             {project.image ? (
-              <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 900px) 50vw, 100vw" priority={priorityFirst && index === 0} />
+              <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 961px) 50vw, 100vw" priority={priorityFirst && index === 0} />
             ) : (
               <span className="projectPlaceholder"><span>{project.name}</span><small>Arşiv / içerik hazırlanıyor</small></span>
             )}

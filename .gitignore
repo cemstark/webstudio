@@ -17,6 +17,7 @@
 /qa/screenshots/
 /qa/lighthouse/
 /qa/robot-transformation/
+/qa/step-1b/baseline/
 
 # next.js
 /.next/

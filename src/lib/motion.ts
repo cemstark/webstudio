@@ -13,7 +13,7 @@ export const motion = {
 
 export const robotMotion = {
   stageAnchor: 0.52,
-  idleLoadDelay: 12000,
-  idleLoadTimeout: 1800,
+  idleLoadDelay: 900,
+  idleLoadTimeout: 900,
   sceneLoadTimeout: 12000,
 } as const;

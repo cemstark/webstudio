@@ -21,14 +21,12 @@ const activeSceneStages = new Set<RobotStage>([
   "service-seo",
   "service-mobile",
   "service-commerce",
-  "projects",
-  "process",
   "final",
 ]);
 
 export function ExperienceShell() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { profile, setProfile } = useExperienceProfile();
+  const { disableExperience, inputMode, profile } = useExperienceProfile();
   const [Scene, setScene] = useState<ComponentType<RobotSceneProps> | null>(null);
   const [sceneStatus, setSceneStatus] = useState<"poster" | "loading" | "ready" | "failed">("poster");
   const [stage, setStage] = useState<RobotStage>("hero");
@@ -36,8 +34,9 @@ export function ExperienceShell() {
 
   const failScene = useCallback(() => {
     setSceneStatus("failed");
-    setProfile("none");
-  }, [setProfile]);
+    disableExperience();
+  }, [disableExperience]);
+  const handleSceneReady = useCallback(() => setSceneStatus("ready"), []);
 
   const handleStageChange = useCallback((nextStage: RobotStage) => setStage(nextStage), []);
 
@@ -75,6 +74,7 @@ export function ExperienceShell() {
       ref={rootRef}
       className={styles.experienceLayer}
       data-experience-profile={profile}
+      data-input-mode={inputMode}
       data-robot-stage="hero"
       data-scene-status={sceneStatus}
       aria-hidden="true"
@@ -86,7 +86,7 @@ export function ExperienceShell() {
           <Scene
             active={active}
             onError={failScene}
-            onReady={() => setSceneStatus("ready")}
+            onReady={handleSceneReady}
           />
         ) : null}
       </div>

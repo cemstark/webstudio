@@ -57,7 +57,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.manifesto} data-header-theme="light">
+      <section className={styles.manifesto} data-robot-stage="manifesto" data-header-theme="light">
         <div className="container">
           <p className="eyebrow" data-reveal>YAKLAŞIM</p>
           <p className={styles.manifestoText} data-reveal>
@@ -122,7 +122,14 @@ export default function Home() {
             </Link>
             <div className={styles.projectInfo}>
               <div><p className="micro">01 · {vela.year} · {vela.statusLabel}</p><h3>{vela.name}</h3></div>
-              <div><p>{vela.category}</p><p>{vela.description}</p>{vela.url ? <a href={vela.url} target="_blank" rel="noopener noreferrer">Canlı site ↗</a> : null}</div>
+              <div>
+                <p>{vela.category}</p>
+                <p>{vela.description}</p>
+                <div className={styles.projectLinks}>
+                  <Link href={`/projeler/${vela.slug}`}>Proje detayı ↗</Link>
+                  {vela.url ? <a href={vela.url} target="_blank" rel="noopener noreferrer">Canlı site ↗</a> : null}
+                </div>
+              </div>
             </div>
           </article>
           <div className={styles.archiveGrid}>
