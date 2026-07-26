@@ -100,6 +100,10 @@ function RuntimeSplineRobotScene({ active, onError, onReady }: SplineRobotSceneP
   }, [onError]);
 
   useEffect(() => {
+    window.performance.mark("cem:spline-mount");
+  }, []);
+
+  useEffect(() => {
     const application = applicationRef.current;
     if (!application) return;
     if (active) application.play();
@@ -130,6 +134,7 @@ function RuntimeSplineRobotScene({ active, onError, onReady }: SplineRobotSceneP
     application.canvas.addEventListener("webglcontextlost", handleContextLoss, { once: true });
     if (!active) application.stop();
     reportLocalSplineInventory(application);
+    window.performance.mark("cem:spline-onload");
     onReady();
   };
 

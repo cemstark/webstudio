@@ -1,0 +1,632 @@
+{
+  "frameCadence": {
+    "averageFps": 60.00469310448866,
+    "averageMs": 16.66536312849161,
+    "p95Ms": 16.700000000000728,
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4080 Laptop GPU (0x000027A0) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "inventory": {
+    "objects": [
+      {
+        "name": "Camera 2",
+        "uuid": "55a65797-787a-4431-b561-905d9c2fdba2",
+        "visible": true
+      },
+      {
+        "name": "Point Light",
+        "uuid": "439da668-45ed-48c3-9283-4c42710b6a39",
+        "visible": true
+      },
+      {
+        "name": "Bot",
+        "uuid": "95b11be5-c203-4914-a8b9-7a05fa62a46c",
+        "visible": true
+      },
+      {
+        "name": "Top part",
+        "uuid": "f9e44b55-1c6c-4300-9515-4bbf9d268cf0",
+        "visible": true
+      },
+      {
+        "name": "Head",
+        "uuid": "3bf648bf-4bd4-4f9f-9bf1-288da3ec4f43",
+        "visible": true
+      },
+      {
+        "name": "Head 2",
+        "uuid": "f9212c6d-779c-4c47-bc10-6534ebb36286",
+        "visible": true
+      },
+      {
+        "name": "Neck",
+        "uuid": "03cba3e5-4e08-49e1-bd9c-c37a9cded0d5",
+        "visible": true
+      },
+      {
+        "name": "Cube",
+        "uuid": "da1ba6a1-3ac6-4bb2-8b30-981617701ca8",
+        "visible": true
+      },
+      {
+        "name": "Cylinder 3",
+        "uuid": "2f8934f6-08a4-406a-a1ce-c6edc51881e5",
+        "visible": true
+      },
+      {
+        "name": "Group 3",
+        "uuid": "2f049732-334a-47a2-a6e6-c9a3685caf35",
+        "visible": true
+      },
+      {
+        "name": "Group 2",
+        "uuid": "fdbae301-779e-4c15-a61f-f1e72ec50f65",
+        "visible": true
+      },
+      {
+        "name": "Cylinder 4",
+        "uuid": "1844768e-ff33-41eb-a115-0ff42b35948a",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "e9abf170-1efa-4dfc-b894-7ab0510dcde5",
+        "visible": true
+      },
+      {
+        "name": "Cylinder 4",
+        "uuid": "33279ea5-848b-47c9-a961-c0d9137c3919",
+        "visible": true
+      },
+      {
+        "name": "Cylinder",
+        "uuid": "c587c208-2f9f-48ae-804d-884698202ca4",
+        "visible": true
+      },
+      {
+        "name": "Hand Instance",
+        "uuid": "0e40bf46-c74d-4e0a-903b-e7c4adc5d818",
+        "visible": true
+      },
+      {
+        "name": "Hand LEFT",
+        "uuid": "7b6503dd-90d7-43ea-98fc-80cbe1fcc58f",
+        "visible": true
+      },
+      {
+        "name": "arm",
+        "uuid": "0cbc5f0f-e0c8-443d-add2-a02355d49895",
+        "visible": true
+      },
+      {
+        "name": "elbow",
+        "uuid": "5f633b50-2275-49fa-97c1-9c5b8d38caf2",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "c36e71fa-4ff9-4ff7-be84-389b90eb703c",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 3",
+        "uuid": "6e064aea-80e8-4ef6-a90d-7fc3dccb878b",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 3",
+        "uuid": "8d3a076b-3944-48c8-a40b-27b350818545",
+        "visible": true
+      },
+      {
+        "name": "forearm",
+        "uuid": "455c3463-61e6-47c5-b80a-6cbdcf536941",
+        "visible": true
+      },
+      {
+        "name": "Hand",
+        "uuid": "f8c1944e-59fe-42da-ab93-aa8c35c4f7de",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 5",
+        "uuid": "0c877cfc-b1dc-4f39-b2c0-15c483e23c4a",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 4",
+        "uuid": "cfd6dbd7-aa32-4bcb-babe-65b378b3134d",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 4",
+        "uuid": "dbd5eb1b-20ee-4892-916f-7564ca0b99a2",
+        "visible": true
+      },
+      {
+        "name": "Cube 3",
+        "uuid": "89ba12e9-b24d-4f61-9a99-0bb5e5f0acac",
+        "visible": true
+      },
+      {
+        "name": "Cube 2",
+        "uuid": "bdc700a5-bdbf-44ef-b004-6e29e373709d",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 6",
+        "uuid": "e28f694c-4142-47bc-97a7-8481065cd763",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 2",
+        "uuid": "42eb37ee-378c-447f-b2c7-02f379f12598",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 2",
+        "uuid": "1c5be8da-73ba-400f-a77b-6ec6f91ed5ef",
+        "visible": true
+      },
+      {
+        "name": "Hand",
+        "uuid": "4d921147-0652-47bc-830a-a2d9eaffc590",
+        "visible": true
+      },
+      {
+        "name": "Hand LEFT",
+        "uuid": "101bc66e-ed93-4578-a9a5-56a2fa16bea7",
+        "visible": true
+      },
+      {
+        "name": "arm",
+        "uuid": "edfc2df1-9758-478a-9771-a59736f77086",
+        "visible": true
+      },
+      {
+        "name": "elbow",
+        "uuid": "c6a80d5f-accd-4fb6-a00b-6559f3c77a16",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "95e9dfa0-3ca4-4e79-9ebf-98569be25b62",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 3",
+        "uuid": "052c525d-3a41-4ec1-ae07-610b04d4f2c8",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 3",
+        "uuid": "4fa36c8b-4184-4c61-934c-b0a00ba17347",
+        "visible": true
+      },
+      {
+        "name": "forearm",
+        "uuid": "1c244a05-58cc-4c2b-b127-62d7d290d995",
+        "visible": true
+      },
+      {
+        "name": "Hand",
+        "uuid": "377263ac-e2d2-4042-b8f3-b532357d5aeb",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 5",
+        "uuid": "39e7cb63-6015-4d8a-b033-3f3127438c28",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 4",
+        "uuid": "2d6bad82-78c6-408c-be82-3a716776c5c9",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 4",
+        "uuid": "952d8f5a-1cab-4f12-8685-90cb8d09c81f",
+        "visible": true
+      },
+      {
+        "name": "Cube 3",
+        "uuid": "45226e20-eea5-4e0f-ac46-0c79e0755786",
+        "visible": true
+      },
+      {
+        "name": "Cube 2",
+        "uuid": "a19fe3ab-d419-49ec-88c9-01e3ac76f259",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 6",
+        "uuid": "1dda6f9e-ba7a-4a19-8d14-4ce0839706da",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 2",
+        "uuid": "4bc11cb0-3c9e-4203-b091-852b6215f099",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 2",
+        "uuid": "5df6356d-2a33-401d-bdf5-5e8e02923692",
+        "visible": true
+      },
+      {
+        "name": "Body",
+        "uuid": "46b3f563-3b31-473b-b869-9612a8f77343",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "da7f7028-b122-4e1a-b5d3-2fc9d354acba",
+        "visible": true
+      },
+      {
+        "name": "Ellipse",
+        "uuid": "d39a7c24-1bfd-4c6e-9f59-a9a50055b64b",
+        "visible": true
+      },
+      {
+        "name": "Rectangle",
+        "uuid": "823ae676-d352-452c-bd17-01e5bcd45697",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "03e50234-e516-43f6-95ff-766878758522",
+        "visible": true
+      },
+      {
+        "name": "Ellipse",
+        "uuid": "0d0367ed-8347-4e03-beb9-f411c4c6f270",
+        "visible": true
+      },
+      {
+        "name": "Rectangle",
+        "uuid": "1cc8aea5-97e8-4f6a-bbdc-02f18d35215d",
+        "visible": true
+      },
+      {
+        "name": "Bottom",
+        "uuid": "2a8d4ee3-0403-41f7-a057-4cc47abb9f8e",
+        "visible": true
+      },
+      {
+        "name": "Group 4",
+        "uuid": "621187e2-46ab-4897-b5bf-d5ae59d27915",
+        "visible": true
+      },
+      {
+        "name": "Group 2",
+        "uuid": "4460e199-9ecf-4743-9abc-7fb72f6c25ec",
+        "visible": true
+      },
+      {
+        "name": "Cylinder 4",
+        "uuid": "8214691a-0809-4172-b1df-aad192da97ea",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "b9d911e6-3b36-4d11-8746-04b37caa709c",
+        "visible": true
+      },
+      {
+        "name": "Cylinder 4",
+        "uuid": "29ed56ba-a7ce-4172-a89b-001c78325752",
+        "visible": true
+      },
+      {
+        "name": "Leg Left Instance",
+        "uuid": "260f7b47-3852-4c41-b694-875d84ab40de",
+        "visible": true
+      },
+      {
+        "name": "femur",
+        "uuid": "48ac7375-0781-4903-b6a3-0667202501f0",
+        "visible": true
+      },
+      {
+        "name": "Cube 3",
+        "uuid": "12036d3c-37cd-4ff6-bcbc-f5232edbfec8",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 9",
+        "uuid": "7993d282-559e-4512-8938-7e52e6e1fef8",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 10",
+        "uuid": "e73edd53-a82a-4a5e-97a4-179757f5f7d3",
+        "visible": true
+      },
+      {
+        "name": "shin",
+        "uuid": "ccd6b348-06da-4ce8-af69-1a8ec0f4d3a8",
+        "visible": true
+      },
+      {
+        "name": "Foot",
+        "uuid": "7dd4b82d-bdfb-4d84-84af-761939172ab4",
+        "visible": true
+      },
+      {
+        "name": "Cube 5",
+        "uuid": "1ccc4a3a-27a7-4606-b15a-0ade3fa04348",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 5",
+        "uuid": "9a45fde0-6de2-47b9-bb0a-da9d8f09a139",
+        "visible": true
+      },
+      {
+        "name": "Cube 4",
+        "uuid": "dc86bdd1-8a50-466f-8ffe-b80e773b5c58",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 4",
+        "uuid": "0c9fdc51-81d1-4f1d-8834-7645ec159fe8",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 12",
+        "uuid": "389d22bf-fcdf-47e1-a893-7ec63bd6dce0",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 11",
+        "uuid": "4e129ae7-a756-4828-b009-de67bda68f9a",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 3",
+        "uuid": "5202566b-40f4-4969-b022-1aa51b85aa1a",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 2",
+        "uuid": "2d7961ba-9fe2-4209-9797-f374e5734af9",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 8",
+        "uuid": "cdaf68a8-4bde-457a-9000-3fe982874763",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 7",
+        "uuid": "f1c05ba1-7546-427d-9065-8b730279c3a4",
+        "visible": true
+      },
+      {
+        "name": "Leg Left",
+        "uuid": "f0a9f3f9-4966-4ed9-b396-6a390cecf7e6",
+        "visible": true
+      },
+      {
+        "name": "femur",
+        "uuid": "fc781c6a-92b2-4654-839c-8d1f5fe7abfb",
+        "visible": true
+      },
+      {
+        "name": "Cube 3",
+        "uuid": "62b05a0d-e2b8-4d8d-9839-434cc7a75022",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 9",
+        "uuid": "9d2f0fc0-ed56-4ecc-9d58-62622516e0bd",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 10",
+        "uuid": "c3ebfc59-fa4b-4704-ba23-db808f44b7cc",
+        "visible": true
+      },
+      {
+        "name": "shin",
+        "uuid": "daae0783-e2ba-4d8c-ae91-24d8dd234cbb",
+        "visible": true
+      },
+      {
+        "name": "Foot",
+        "uuid": "2d4593a9-6513-465d-b243-146d5c47839e",
+        "visible": true
+      },
+      {
+        "name": "Cube 5",
+        "uuid": "79677ee9-0039-4a29-a7ca-29d4f608cf86",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 5",
+        "uuid": "f29b2756-36b8-44b6-ba7b-7b3d2271b01a",
+        "visible": true
+      },
+      {
+        "name": "Cube 4",
+        "uuid": "96a2eb48-7334-42e8-9f7a-fc2037d589ef",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 4",
+        "uuid": "c52b45a2-a902-4f8e-b0ad-58f45e5ca055",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 12",
+        "uuid": "6e7b4241-070e-446a-933c-354177b1a690",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 11",
+        "uuid": "54df2690-6737-43e3-a1d2-72425c9d2a0f",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 3",
+        "uuid": "7a2951eb-a8d8-41b9-b9e1-31cf89acb932",
+        "visible": true
+      },
+      {
+        "name": "Ellipse 2",
+        "uuid": "24dfe664-a0c7-4a6a-9b98-5b23752329f2",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 8",
+        "uuid": "40bb7d69-ed65-4ed5-86e1-103f6cccc2dc",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 7",
+        "uuid": "b75256d1-b4e1-4e9a-8eab-7bec158fa2fd",
+        "visible": true
+      },
+      {
+        "name": "Pelvic",
+        "uuid": "5de53c5f-134e-4125-b9e3-6cc7a406fdb0",
+        "visible": true
+      },
+      {
+        "name": "Group 2",
+        "uuid": "f116024c-6214-4ff0-adca-bfeb516ad133",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 5",
+        "uuid": "fb3fbc25-02b6-4a17-b6f6-cf29a43a9e6c",
+        "visible": true
+      },
+      {
+        "name": "Ellipse",
+        "uuid": "7822f179-9a42-4f58-8ed8-3e066afbbceb",
+        "visible": true
+      },
+      {
+        "name": "Group",
+        "uuid": "78eb783c-622b-4b9c-a90c-ffd5f5f48c33",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 5",
+        "uuid": "c9d2f128-a7b5-4605-8e3a-ab6a94efeda5",
+        "visible": true
+      },
+      {
+        "name": "Ellipse",
+        "uuid": "cf6ea383-3ce3-4789-be5d-fad5efade5ab",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 4",
+        "uuid": "e856c3e6-9a15-4e19-9cc1-907194cf16a2",
+        "visible": true
+      },
+      {
+        "name": "Group 3",
+        "uuid": "95b6a2f8-7cb7-4025-bc88-a4e3e538e6b4",
+        "visible": true
+      },
+      {
+        "name": "Rectangle 3",
+        "uuid": "f81ac7f0-9020-4b15-bbd1-547b95131aa4",
+        "visible": true
+      },
+      {
+        "name": "Rectangle",
+        "uuid": "a8f3a7df-8b38-4e17-bda8-9ee7c8fb1114",
+        "visible": true
+      }
+    ],
+    "variables": {},
+    "events": [
+      {
+        "event": "start",
+        "target": "55a65797-787a-4431-b561-905d9c2fdba2"
+      },
+      {
+        "event": "start",
+        "target": "f9212c6d-779c-4c47-bc10-6534ebb36286"
+      },
+      {
+        "event": "start",
+        "target": "7b6503dd-90d7-43ea-98fc-80cbe1fcc58f"
+      },
+      {
+        "event": "start",
+        "target": "0cbc5f0f-e0c8-443d-add2-a02355d49895"
+      },
+      {
+        "event": "start",
+        "target": "5f633b50-2275-49fa-97c1-9c5b8d38caf2"
+      },
+      {
+        "event": "start",
+        "target": "455c3463-61e6-47c5-b80a-6cbdcf536941"
+      },
+      {
+        "event": "start",
+        "target": "f8c1944e-59fe-42da-ab93-aa8c35c4f7de"
+      },
+      {
+        "event": "start",
+        "target": "101bc66e-ed93-4578-a9a5-56a2fa16bea7"
+      },
+      {
+        "event": "start",
+        "target": "edfc2df1-9758-478a-9771-a59736f77086"
+      },
+      {
+        "event": "start",
+        "target": "c6a80d5f-accd-4fb6-a00b-6559f3c77a16"
+      },
+      {
+        "event": "start",
+        "target": "1c244a05-58cc-4c2b-b127-62d7d290d995"
+      },
+      {
+        "event": "start",
+        "target": "377263ac-e2d2-4042-b8f3-b532357d5aeb"
+      },
+      {
+        "event": "lookAt",
+        "target": "f9e44b55-1c6c-4300-9515-4bbf9d268cf0"
+      },
+      {
+        "event": "lookAt",
+        "target": "3bf648bf-4bd4-4f9f-9bf1-288da3ec4f43"
+      }
+    ]
+  },
+  "network": [
+    {
+      "fromDiskCache": false,
+      "status": 200,
+      "url": "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode",
+      "encodedDataLength": 1245964
+    },
+    {
+      "fromDiskCache": false,
+      "status": 200,
+      "url": "https://unpkg.com/@splinetool/modelling-wasm@1.12.98/build/process.wasm",
+      "encodedDataLength": 190282
+    },
+    {
+      "fromDiskCache": true,
+      "status": 200,
+      "url": "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode",
+      "encodedDataLength": 0
+    },
+    {
+      "fromDiskCache": true,
+      "status": 200,
+      "url": "https://unpkg.com/@splinetool/modelling-wasm@1.12.98/build/process.wasm",
+      "encodedDataLength": 0
+    }
+  ]
+}

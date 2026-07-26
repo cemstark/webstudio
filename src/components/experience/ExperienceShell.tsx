@@ -33,22 +33,32 @@ export function ExperienceShell() {
   const [pageVisible, setPageVisible] = useState(true);
 
   const failScene = useCallback(() => {
+    window.performance.mark("cem:spline-failed");
     setSceneStatus("failed");
     disableExperience();
   }, [disableExperience]);
-  const handleSceneReady = useCallback(() => setSceneStatus("ready"), []);
+  const handleSceneReady = useCallback(() => {
+    window.performance.mark("cem:spline-ready");
+    setSceneStatus("ready");
+  }, []);
 
   const handleStageChange = useCallback((nextStage: RobotStage) => setStage(nextStage), []);
 
   useEffect(() => {
     if (profile !== "full" || Scene) return;
     let cancelled = false;
+    window.performance.mark("cem:spline-import-start");
+    window.queueMicrotask(() => {
+      if (!cancelled) setSceneStatus("loading");
+    });
     void import("./SplineRobotScene").then((module) => {
       if (!cancelled) {
-        setSceneStatus("loading");
+        window.performance.mark("cem:spline-import-end");
         setScene(() => module.SplineRobotScene);
       }
-    }).catch(failScene);
+    }).catch(() => {
+      if (!cancelled) failScene();
+    });
 
     return () => {
       cancelled = true;

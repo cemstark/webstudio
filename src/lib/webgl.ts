@@ -66,7 +66,10 @@ export function detectBaselineExperienceProfile(): BaselineExperienceProfile {
   const qaOverride = localQaProfileOverride();
 
   if (reducedMotion || hints.connection?.saveData || sceneFailedThisSession()) return "none";
-  if (qaOverride) return qaOverride;
+  if (qaOverride === "lite") return "lite";
+  // Keep the full QA path on the same intent/idle scheduler as production.
+  // The override selects the renderer tier, not an artificially eager load.
+  if (qaOverride === "full") return "candidate";
 
   const conservativeHardware = typeof hints.deviceMemory === "number" && hints.deviceMemory < 4;
   const criticallyLowConcurrency = typeof hints.hardwareConcurrency === "number" && hints.hardwareConcurrency <= 2;
@@ -78,6 +81,7 @@ export function detectBaselineExperienceProfile(): BaselineExperienceProfile {
 export function detectExperienceProfile(): ExperienceProfile {
   const baseline = detectBaselineExperienceProfile();
   if (baseline !== "candidate") return baseline;
+  if (localQaProfileOverride() === "full") return "full";
   const capability = detectWebGLCapability();
   if (capability === "none") return "none";
   if (capability === "software" && !window.__CEM_SPLINE_TEST_MOCK__) return "lite";

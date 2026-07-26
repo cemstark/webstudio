@@ -21,7 +21,7 @@ const desktopViewports = [
   { name: "1440x900", width: 1440, height: 900 },
   { name: "1920x1080", width: 1920, height: 1080 },
 ] as const;
-const outputRoot = "qa/screenshots/step-2/after";
+const outputRoot = "qa/screenshots/step-3/after";
 
 const viewportFilter = new Set((process.env.QA_VIEWPORTS ?? "").split(",").filter(Boolean));
 const selectedMobileViewports = viewportFilter.size
@@ -247,10 +247,95 @@ test("real scene inventory, warm-cache signals and active frame cadence", async 
   });
 
   const networkData = [...network.values()];
-  await mkdir("qa/network/step-2", { recursive: true });
-  await writeFile(`qa/network/step-2/spline-runtime-evidence-${testInfo.project.name}.json`, `${JSON.stringify({ frameCadence, inventory: inventoryData, network: networkData }, null, 2)}\n`);
+  await mkdir("qa/network/step-3", { recursive: true });
+  await writeFile(`qa/network/step-3/spline-runtime-evidence-${testInfo.project.name}.json`, `${JSON.stringify({ frameCadence, inventory: inventoryData, network: networkData }, null, 2)}\n`);
   console.info(`[qa-spline-runtime] ${JSON.stringify({ frameCadence, network: networkData })}`);
   expect((inventoryData as { objects?: unknown[] } | undefined)?.objects?.length ?? 0).toBeGreaterThan(0);
   expect(networkData.filter((entry) => entry.url.includes("scene.splinecode"))).toHaveLength(2);
+  await context.close();
+});
+
+test("60-second hardware scroll and idle soak stays within frame and heap budgets", async ({ browser }, testInfo) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "no-preference" });
+  const page = await context.newPage();
+  const client = await context.newCDPSession(page);
+  await client.send("HeapProfiler.enable");
+
+  await page.goto("/?qa-spline-inventory=1", { waitUntil: "domcontentloaded" });
+  await waitForProductionScene(page);
+  await client.send("HeapProfiler.collectGarbage");
+  const heapBefore = await client.send("Runtime.getHeapUsage");
+
+  const soak = await page.evaluate(async () => {
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-spline-scene] canvas");
+    if (!canvas) throw new Error("Spline canvas missing before soak.");
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    const rendererInfo = gl?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = gl && rendererInfo
+      ? String(gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL))
+      : "unavailable";
+    const stageNames = ["hero", "service-web", "service-seo", "service-mobile", "service-commerce", "projects", "pricing", "final"];
+    const stages = stageNames.map((stage) => document.querySelector<HTMLElement>(
+      `[data-robot-stage="${stage}"]:not([data-experience-profile])`,
+    )).filter((element): element is HTMLElement => Boolean(element));
+    const samples: number[] = [];
+    let contextLosses = 0;
+    const onContextLoss = () => { contextLosses += 1; };
+    canvas.addEventListener("webglcontextlost", onContextLoss);
+    const startedAt = performance.now();
+    let previousFrame = startedAt;
+    let nextStageAt = startedAt;
+    let stageIndex = 0;
+
+    await new Promise<void>((resolve) => {
+      const sample = (time: number) => {
+        samples.push(time - previousFrame);
+        previousFrame = time;
+        if (time >= nextStageAt && stages.length) {
+          const stage = stages[stageIndex % stages.length];
+          const rect = stage.getBoundingClientRect();
+          window.scrollTo(0, Math.max(0, window.scrollY + rect.top));
+          window.dispatchEvent(new Event("scroll"));
+          stageIndex += 1;
+          nextStageAt += 5_000;
+        }
+        if (time - startedAt >= 60_000) resolve();
+        else requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+
+    canvas.removeEventListener("webglcontextlost", onContextLoss);
+    const ordered = samples.slice(1).sort((left, right) => left - right);
+    const averageMs = ordered.reduce((sum, value) => sum + value, 0) / ordered.length;
+    return {
+      averageFps: 1_000 / averageMs,
+      averageMs,
+      canvasCount: document.querySelectorAll("[data-spline-scene] canvas").length,
+      contextLosses,
+      p95Ms: ordered[Math.floor(ordered.length * 0.95)],
+      renderer,
+      sampleCount: ordered.length,
+      stageChanges: stageIndex,
+    };
+  });
+
+  await client.send("HeapProfiler.collectGarbage");
+  const heapAfter = await client.send("Runtime.getHeapUsage");
+  const evidence = {
+    ...soak,
+    heapAfterBytes: heapAfter.usedSize,
+    heapBeforeBytes: heapBefore.usedSize,
+    heapDeltaBytes: heapAfter.usedSize - heapBefore.usedSize,
+  };
+  await mkdir("qa/network/step-3", { recursive: true });
+  await writeFile(`qa/network/step-3/hardware-soak-${testInfo.project.name}.json`, `${JSON.stringify(evidence, null, 2)}\n`);
+  console.info(`[qa-spline-soak] ${JSON.stringify(evidence)}`);
+
+  expect(soak.canvasCount).toBe(1);
+  expect(soak.contextLosses).toBe(0);
+  expect(soak.averageFps).toBeGreaterThanOrEqual(55);
+  expect(soak.p95Ms).toBeLessThanOrEqual(22);
+  expect(evidence.heapDeltaBytes).toBeLessThan(8 * 1024 * 1024);
   await context.close();
 });

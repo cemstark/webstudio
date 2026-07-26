@@ -45,7 +45,7 @@ export default function Home() {
               Web tasarım, SEO, mobil uygulama ve e-ticareti stratejiyle aynı üretim çizgisinde buluşturuyorum.
             </p>
             <div className={styles.heroActions}>
-              <Link className={styles.primaryCta} href="/iletisim">Projenizi konuşalım <span aria-hidden="true">↗</span></Link>
+              <Link className={styles.primaryCta} href="/iletisim" prefetch={false}>Projenizi konuşalım <span aria-hidden="true">↗</span></Link>
               <Link className={styles.secondaryCta} href="#secili-projeler">Çalışmaları keşfet <span aria-hidden="true">↓</span></Link>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function Home() {
           </div>
           <article className={styles.featuredProject} data-reveal>
             <Link className={styles.velaVisual} href={`/projeler/${vela.slug}`} aria-label="Vela Windsurfing proje detayını gör">
-              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1100px) 72vw, (min-width: 700px) 86vw, 100vw" priority /> : null}
+              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1100px) 72vw, (min-width: 700px) 86vw, 100vw" /> : null}
               <span>Projeyi gör ↗</span>
             </Link>
             <div className={styles.projectInfo}>

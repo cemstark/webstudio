@@ -83,11 +83,11 @@ export function SiteHeader() {
   return (
     <header className="siteHeader" data-theme={open ? "dark" : theme}>
       <div className="headerInner">
-        <Link className="brand" href="/" aria-label="cemwebstudio ana sayfa" onClick={() => setOpen(false)}>
+        <Link className="brand" href="/" prefetch={false} aria-label="cemwebstudio ana sayfa" onClick={() => setOpen(false)}>
           cem<span>webstudio</span>
         </Link>
         <div className="headerActions">
-          <Link className="headerProjectLink" href="/iletisim">Proje Başlat <span aria-hidden="true">↗</span></Link>
+          <Link className="headerProjectLink" href="/iletisim" prefetch={false}>Proje Başlat <span aria-hidden="true">↗</span></Link>
           <button
             ref={openerRef}
             className="menuButton"

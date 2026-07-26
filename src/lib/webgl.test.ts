@@ -99,6 +99,7 @@ describe("experience capability policy", () => {
   it("supports a localhost-only full override for isolated 3D QA", () => {
     installBrowserFixture({ webgl: false });
     Object.assign(window.location, { hostname: "localhost", search: "?qa-experience=full" });
+    expect(detectBaselineExperienceProfile()).toBe("candidate");
     expect(detectExperienceProfile()).toBe("full");
   });
 

@@ -54,8 +54,6 @@ export function RobotStoryController({ hostRef, onStageChange }: RobotStoryContr
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
-    const resizeObserver = new ResizeObserver(schedule);
-    sections.forEach(({ element }) => resizeObserver.observe(element));
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     update();
@@ -63,7 +61,6 @@ export function RobotStoryController({ hostRef, onStageChange }: RobotStoryContr
     return () => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
-      resizeObserver.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [hostRef, onStageChange]);

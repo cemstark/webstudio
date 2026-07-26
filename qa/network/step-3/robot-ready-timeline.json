@@ -1,0 +1,52 @@
+{
+  "environment": {
+    "node": "v22.23.1",
+    "viewport": "390x844",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4080 Laptop GPU Direct3D11)",
+    "server": "Next.js production",
+    "runsPerMode": 3,
+    "coldDefinition": "fresh isolated browser context",
+    "warmDefinition": "same-context navigation after the cold run"
+  },
+  "idle": {
+    "cold": [
+      { "run": 1, "fcpMs": 316, "readyMs": 6849.7, "fcpToReadyMs": 6533.7, "sceneStartMs": 1210, "sceneEndMs": 4916, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 2, "fcpMs": 132, "readyMs": 2100, "fcpToReadyMs": 1968, "sceneStartMs": 1189, "sceneEndMs": 1793, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 3, "fcpMs": 128, "readyMs": 2107.8, "fcpToReadyMs": 1979.8, "sceneStartMs": 1193, "sceneEndMs": 1807, "sceneRequests": 1, "canvasCount": 1 }
+    ],
+    "warm": [
+      { "run": 1, "fcpMs": 140, "readyMs": 1383.5, "fcpToReadyMs": 1243.5, "sceneStartMs": 1181, "sceneEndMs": 1197, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 2, "fcpMs": 132, "readyMs": 1366.2, "fcpToReadyMs": 1234.2, "sceneStartMs": 1163, "sceneEndMs": 1179, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 3, "fcpMs": 132, "readyMs": 1367.6, "fcpToReadyMs": 1235.6, "sceneStartMs": 1165, "sceneEndMs": 1180, "sceneRequests": 1, "canvasCount": 1 }
+    ],
+    "median": {
+      "coldReadyMs": 2107.8,
+      "coldFcpToReadyMs": 1979.8,
+      "warmReadyMs": 1367.6,
+      "warmFcpToReadyMs": 1235.6
+    }
+  },
+  "intentAt300Ms": {
+    "cold": [
+      { "run": 1, "fcpMs": 308, "intentMs": 352.5, "readyMs": 2813.8, "intentToReadyMs": 2461.3, "fcpToReadyMs": 2505.8, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 2, "fcpMs": 128, "intentMs": 338.8, "readyMs": 1379.1, "intentToReadyMs": 1040.3, "fcpToReadyMs": 1251.1, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 3, "fcpMs": 132, "intentMs": 362.8, "readyMs": 1535.1, "intentToReadyMs": 1172.3, "fcpToReadyMs": 1403.1, "sceneRequests": 1, "canvasCount": 1 }
+    ],
+    "warm": [
+      { "run": 1, "fcpMs": 144, "intentMs": 349.6, "readyMs": 678.3, "intentToReadyMs": 328.7, "fcpToReadyMs": 534.3, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 2, "fcpMs": 140, "intentMs": 336.1, "readyMs": 656.6, "intentToReadyMs": 320.5, "fcpToReadyMs": 516.6, "sceneRequests": 1, "canvasCount": 1 },
+      { "run": 3, "fcpMs": 132, "intentMs": 341.4, "readyMs": 660.1, "intentToReadyMs": 318.7, "fcpToReadyMs": 528.1, "sceneRequests": 1, "canvasCount": 1 }
+    ],
+    "median": {
+      "coldIntentToReadyMs": 1172.3,
+      "coldFcpToReadyMs": 1403.1,
+      "warmIntentToReadyMs": 320.5,
+      "warmFcpToReadyMs": 528.1
+    }
+  },
+  "notes": [
+    "Every recorded run had exactly one scene request and one canvas.",
+    "Cold idle run 1 is a retained network outlier; medians are not substituted for individual runs.",
+    "LCP was the visible HTML hero heading and matched FCP in this unthrottled hardware probe."
+  ]
+}

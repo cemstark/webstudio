@@ -1,0 +1,13 @@
+{
+  "averageFps": 60.00236610274849,
+  "averageMs": 16.66600944182089,
+  "canvasCount": 1,
+  "contextLosses": 0,
+  "p95Ms": 16.700000000004366,
+  "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4080 Laptop GPU (0x000027A0) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "sampleCount": 3601,
+  "stageChanges": 13,
+  "heapAfterBytes": 13854924,
+  "heapBeforeBytes": 12462876,
+  "heapDeltaBytes": 1392048
+}

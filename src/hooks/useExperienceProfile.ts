@@ -28,12 +28,21 @@ export function useExperienceProfile() {
 
     const updateBaseline = () => {
       const baseline = detectBaselineExperienceProfile();
-      if (baseline !== "candidate") setProfile(baseline);
+      if (baseline !== "candidate") {
+        window.performance.mark(`cem:experience-profile-${baseline}`);
+        setProfile(baseline);
+      }
     };
     const activate = () => {
       if (activationStarted || detectBaselineExperienceProfile() !== "candidate") return;
       activationStarted = true;
-      setProfile(detectExperienceProfile());
+      const nextProfile = detectExperienceProfile();
+      window.performance.mark(`cem:experience-profile-${nextProfile}`);
+      setProfile(nextProfile);
+    };
+    const activateFromIntent = () => {
+      if (!activationStarted) window.performance.mark("cem:experience-intent");
+      activate();
     };
     const updateInputMode = () => setInputMode(detectExperienceInputMode());
     const intentEvents = ["pointerdown", "touchstart", "wheel"] as const;
@@ -43,7 +52,7 @@ export function useExperienceProfile() {
     reducedMotion.addEventListener("change", updateBaseline);
     coarsePointer.addEventListener("change", updateInputMode);
     hover.addEventListener("change", updateInputMode);
-    intentEvents.forEach((eventName) => window.addEventListener(eventName, activate, { once: true, passive: true }));
+    intentEvents.forEach((eventName) => window.addEventListener(eventName, activateFromIntent, { once: true, passive: true }));
     let idleHandle: number | null = null;
     const idleDelayHandle = window.setTimeout(() => {
       if ("requestIdleCallback" in window) {
@@ -57,7 +66,7 @@ export function useExperienceProfile() {
       reducedMotion.removeEventListener("change", updateBaseline);
       coarsePointer.removeEventListener("change", updateInputMode);
       hover.removeEventListener("change", updateInputMode);
-      intentEvents.forEach((eventName) => window.removeEventListener(eventName, activate));
+      intentEvents.forEach((eventName) => window.removeEventListener(eventName, activateFromIntent));
       window.clearTimeout(idleDelayHandle);
       if (idleHandle !== null && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
     };
