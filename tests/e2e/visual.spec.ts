@@ -1,4 +1,5 @@
 import { devices, expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { mkdir, writeFile } from "node:fs/promises";
 
 test.describe.configure({ timeout: 600_000 });
 
@@ -16,9 +17,11 @@ const mobileViewports = [
 ] as const;
 
 const desktopViewports = [
+  { name: "1366x768", width: 1366, height: 768 },
   { name: "1440x900", width: 1440, height: 900 },
   { name: "1920x1080", width: 1920, height: 1080 },
 ] as const;
+const outputRoot = "qa/screenshots/step-2/after";
 
 const viewportFilter = new Set((process.env.QA_VIEWPORTS ?? "").split(",").filter(Boolean));
 const selectedMobileViewports = viewportFilter.size
@@ -54,6 +57,11 @@ async function positionStage(page: Page, stage: string, block: "start" | "center
   }, block);
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-robot-stage", stage);
+  const splineScene = page.locator("[data-spline-scene]");
+  if (await splineScene.count()) {
+    const activeStages = new Set(["hero", "service-web", "service-seo", "service-mobile", "service-commerce", "final"]);
+    await expect(splineScene).toHaveAttribute("data-spline-active", activeStages.has(stage) ? "true" : "false");
+  }
 }
 
 async function captureStory(page: Page, directory: string, includeServiceMids = true) {
@@ -100,7 +108,7 @@ test("real production Spline mobile and tablet visual matrix", async ({ browser 
 
   for (const viewport of selectedMobileViewports) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await captureStory(page, `qa/screenshots/step-1b/after/mobile-full/${viewport.name}`);
+    await captureStory(page, `${outputRoot}/mobile-full/${viewport.name}`);
     await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
   }
   expect(sceneRequests).toHaveLength(1);
@@ -119,7 +127,7 @@ test("real production Spline desktop regression matrix", async ({ browser }) => 
 
   for (const viewport of desktopViewports) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await captureStory(page, `qa/screenshots/step-1b/after/desktop-full/${viewport.name}`, false);
+    await captureStory(page, `${outputRoot}/desktop-full/${viewport.name}`, false);
     await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
   }
   expect(sceneRequests).toHaveLength(1);
@@ -131,7 +139,7 @@ async function captureFallbackMode(context: BrowserContext, mode: string, viewpo
   await page.goto("/");
   await page.evaluate(() => { document.documentElement.style.scrollBehavior = "auto"; });
   await expect(page.locator("[data-robot-fallback]")).toBeVisible();
-  const directory = `qa/screenshots/step-1b/after/${mode}/${viewport.name}`;
+  const directory = `${outputRoot}/${mode}/${viewport.name}`;
   await captureViewport(page, `${directory}/hero.png`);
   for (const [stage, filename] of [["service-web", "service-01-web-tasarim"], ["final", "final-cta"]] as const) {
     await positionStage(page, stage, stage === "final" ? "start" : "center");
@@ -158,7 +166,91 @@ for (const viewport of [mobileViewports[3], mobileViewports[5], desktopViewports
     const blockedPage = await blockedContext.newPage();
     await blockedPage.goto("/");
     await expect(blockedPage.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "none", { timeout: 15_000 });
-    await captureViewport(blockedPage, `qa/screenshots/step-1b/after/scene-blocked/${viewport.name}/hero.png`);
+    await captureViewport(blockedPage, `${outputRoot}/scene-blocked/${viewport.name}/hero.png`);
     await blockedContext.close();
   });
 }
+
+test("inner pricing route visual has no Spline network or canvas", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+  const splineRequests: string[] = [];
+  context.on("request", (request) => {
+    if (/SplineRobotScene|splinetool|spline\.design|scene\.splinecode/i.test(request.url())) splineRequests.push(request.url());
+  });
+  const page = await context.newPage();
+  await page.goto("/fiyatlandirma");
+  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.locator("canvas")).toHaveCount(0);
+  await page.screenshot({ path: `${outputRoot}/inner/fiyatlandirma-1440x900.jpg`, fullPage: true, quality: 82, type: "jpeg" });
+  expect(splineRequests).toEqual([]);
+  await context.close();
+});
+
+test("real scene inventory, warm-cache signals and active frame cadence", async ({ browser }, testInfo) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "no-preference" });
+  await context.addInitScript(() => {
+    window.addEventListener("cem:spline-inventory", ((event: CustomEvent) => {
+      Object.defineProperty(window, "__CEM_SPLINE_INVENTORY__", { configurable: true, value: event.detail, writable: true });
+    }) as EventListener);
+  });
+  const page = await context.newPage();
+  const client = await context.newCDPSession(page);
+  await client.send("Network.enable");
+  const network = new Map<string, { encodedDataLength?: number; fromDiskCache?: boolean; status?: number; url: string }>();
+  client.on("Network.responseReceived", (event) => {
+    if (!/scene\.splinecode|process\.wasm/i.test(event.response.url)) return;
+    network.set(event.requestId, {
+      fromDiskCache: event.response.fromDiskCache,
+      status: event.response.status,
+      url: event.response.url,
+    });
+  });
+  client.on("Network.loadingFinished", (event) => {
+    const entry = network.get(event.requestId);
+    if (entry) entry.encodedDataLength = event.encodedDataLength;
+  });
+
+  await page.goto("/?qa-spline-inventory=1", { waitUntil: "domcontentloaded" });
+  await waitForProductionScene(page);
+  const inventory = await expect.poll(() => page.evaluate(() => (
+    (window as typeof window & { __CEM_SPLINE_INVENTORY__?: unknown }).__CEM_SPLINE_INVENTORY__
+  ))).not.toBeUndefined();
+  void inventory;
+  const inventoryData = await page.evaluate(() => (
+    (window as typeof window & { __CEM_SPLINE_INVENTORY__?: unknown }).__CEM_SPLINE_INVENTORY__
+  ));
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await waitForProductionScene(page);
+
+  const frameCadence = await page.evaluate(async () => {
+    const canvas = document.querySelector<HTMLCanvasElement>("[data-spline-scene] canvas");
+    const context = canvas?.getContext("webgl2") ?? canvas?.getContext("webgl");
+    const rendererInfo = context?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = context && rendererInfo
+      ? String(context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL))
+      : "unavailable";
+    const samples: number[] = [];
+    let previous = performance.now();
+    await new Promise<void>((resolve) => {
+      const sample = (time: number) => {
+        samples.push(time - previous);
+        previous = time;
+        if (samples.length >= 180) resolve();
+        else requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    const ordered = samples.slice(1).sort((left, right) => left - right);
+    const p95Ms = ordered[Math.floor(ordered.length * 0.95)];
+    const averageMs = ordered.reduce((sum, value) => sum + value, 0) / ordered.length;
+    return { averageFps: 1_000 / averageMs, averageMs, p95Ms, renderer };
+  });
+
+  const networkData = [...network.values()];
+  await mkdir("qa/network/step-2", { recursive: true });
+  await writeFile(`qa/network/step-2/spline-runtime-evidence-${testInfo.project.name}.json`, `${JSON.stringify({ frameCadence, inventory: inventoryData, network: networkData }, null, 2)}\n`);
+  console.info(`[qa-spline-runtime] ${JSON.stringify({ frameCadence, network: networkData })}`);
+  expect((inventoryData as { objects?: unknown[] } | undefined)?.objects?.length ?? 0).toBeGreaterThan(0);
+  expect(networkData.filter((entry) => entry.url.includes("scene.splinecode"))).toHaveLength(2);
+  await context.close();
+});

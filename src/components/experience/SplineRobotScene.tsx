@@ -19,6 +19,23 @@ type SplineRobotSceneProps = {
   onReady: () => void;
 };
 
+function reportLocalSplineInventory(application: Application) {
+  const isLocalQa = ["127.0.0.1", "localhost"].includes(window.location.hostname)
+    && new URLSearchParams(window.location.search).has("qa-spline-inventory");
+  if (!isLocalQa) return;
+
+  const splineEvents = application.getSplineEvents();
+  window.dispatchEvent(new CustomEvent("cem:spline-inventory", {
+    detail: {
+      objects: application.getAllObjects().map(({ name, uuid, visible }) => ({ name, uuid, visible })),
+      variables: application.getVariables(),
+      events: Object.entries(splineEvents).flatMap(([event, targets]) => (
+        Object.keys(targets).map((target) => ({ event, target }))
+      )),
+    },
+  }));
+}
+
 class SplineErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { failed: boolean }
@@ -76,6 +93,7 @@ export function SplineRobotScene({ active, onError, onReady }: SplineRobotSceneP
 function RuntimeSplineRobotScene({ active, onError, onReady }: SplineRobotSceneProps) {
   const applicationRef = useRef<Application | null>(null);
   const contextLossCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contextLossHandlerRef = useRef<((event: Event) => void) | null>(null);
   const handleContextLoss = useCallback((event: Event) => {
     event.preventDefault();
     onError();
@@ -89,15 +107,29 @@ function RuntimeSplineRobotScene({ active, onError, onReady }: SplineRobotSceneP
   }, [active]);
 
   useEffect(() => {
-    const canvas = contextLossCanvasRef.current;
-    return () => canvas?.removeEventListener("webglcontextlost", handleContextLoss);
-  }, [handleContextLoss]);
+    return () => {
+      const canvas = contextLossCanvasRef.current;
+      const handler = contextLossHandlerRef.current;
+      if (canvas && handler) canvas.removeEventListener("webglcontextlost", handler);
+      applicationRef.current?.stop();
+      contextLossCanvasRef.current = null;
+      contextLossHandlerRef.current = null;
+      applicationRef.current = null;
+    };
+  }, []);
 
   const handleLoad = (application: Application) => {
+    const previousCanvas = contextLossCanvasRef.current;
+    const previousHandler = contextLossHandlerRef.current;
+    if (previousCanvas && previousHandler) {
+      previousCanvas.removeEventListener("webglcontextlost", previousHandler);
+    }
     applicationRef.current = application;
     contextLossCanvasRef.current = application.canvas;
+    contextLossHandlerRef.current = handleContextLoss;
     application.canvas.addEventListener("webglcontextlost", handleContextLoss, { once: true });
     if (!active) application.stop();
+    reportLocalSplineInventory(application);
     onReady();
   };
 
@@ -106,6 +138,7 @@ function RuntimeSplineRobotScene({ active, onError, onReady }: SplineRobotSceneP
       <Spline
         className={styles.splineMount}
         data-spline-scene="robot-guide"
+        data-spline-active={active ? "true" : "false"}
         scene={SPLINE_ROBOT_SCENE_URL}
         renderOnDemand
         onLoad={handleLoad}

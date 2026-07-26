@@ -34,7 +34,7 @@ Eski `three`, `@react-three/fiber` ve `@types/three` bağımlılıkları kaldır
 - `lite`: düşük bellek/CPU veya 2G sınıfı ağ gibi ölçülebilir kapasite kısıtlarında seçilir. Remote scene/runtime yüklenmez; CSS robot, hizmetlere özel grid/tarama/telefon/ticaret enstrümanları ve final rehber kompozisyonu korunur.
 - `none`: reduced-motion, Save-Data, WebGL/context kaybı, scene yükleme hatası veya aynı oturumdaki önceki scene hatasında seçilir. Spline isteği/canvas yoktur; bütün içerik ve CTA’lar server-rendered fallback ile görünürdür.
 
-Pointer/hover kabiliyeti yalnız input davranışını belirler; render tier seçmez. Uygulamanın içerik breakpoint’i tek bir `960px` eşiğinde hizalanmıştır; orientation ve 899/900/959/960/961 geçişleri scene’i yeniden mount etmez. Yerel Lighthouse karşılaştırmalarında `?qa-experience=lite` yalnız `localhost`/`127.0.0.1` üzerinde lite profili deterministik olarak zorlar.
+Pointer/hover kabiliyeti yalnız input davranışını belirler; render tier seçmez. Uygulamanın içerik breakpoint’i tek bir `960px` eşiğinde hizalanmıştır; orientation ve 899/900/959/960/961 geçişleri scene’i yeniden mount etmez. SwiftShader/llvmpipe gibi software WebGL renderer’ları canlı sahne yerine `lite` profile alınır. Yerel QA karşılaştırmalarında `?qa-experience=lite` ve `?qa-experience=full` yalnız `localhost`/`127.0.0.1` üzerinde ilgili profili deterministik olarak zorlar; reduced-motion her durumda `none` önceliğini korur.
 
 Sekme görünür değilken ve robotun gerekmediği chapter’larda desteklenen resmî `stop()` yöntemiyle render durdurulur. Scene başarısız olursa aynı oturumda sonsuz yeniden yükleme yapılmaz. Vela görseli Spline dokusuna taşınmaz; `next/image`, sabit oran ve responsive `sizes` ile sunulur.
 
@@ -55,6 +55,7 @@ npm test
 npm run build
 npm run test:smoke
 npm run test:e2e
+npm run test:cross-browser
 npm run qa:screenshots
 npm run qa:lighthouse
 npm audit
@@ -66,7 +67,7 @@ Playwright Chromium ilk kullanımda gerekiyorsa:
 npx playwright install chromium
 ```
 
-Adım 1B responsive QA çıktıları `qa/screenshots/step-1b/after/<profil>/<viewport>/` altında üretilir. Suite 320×568–1024×768 touch matrisi ile 1440×900 ve 1920×1080 desktop kadrajlarında hero, manifesto, dört hizmetin başlangıç/orta noktaları, Vela, fiyat, süreç, SSS, final CTA ve açık menüyü; ayrıca lite, reduced-motion ve engellenmiş Spline fallback’lerini üretir. Dizin Git tarafından izlenmez. Lighthouse JSON raporları `qa/lighthouse/` altında tutulur; teslim özeti `qa/STEP-1B-MOBILE-ADAPTATION-REPORT.md` dosyasındadır.
+Adım 1B responsive QA çıktıları `qa/screenshots/step-1b/after/<profil>/<viewport>/` altında, Adım 2 çıktıları ise `qa/screenshots/step-2/after/<profil>/<viewport>/` altında üretilir. Adım 2 suite’i 320×568–1024×768 touch matrisi ile 1366×768, 1440×900 ve 1920×1080 desktop kadrajlarında hero, manifesto, dört hizmetin başlangıç/orta noktaları, Vela, fiyat, süreç, SSS, final CTA ve açık menüyü; ayrıca lite, reduced-motion ve engellenmiş Spline fallback’lerini üretir. Görsel ve Lighthouse ham çıktıları Git tarafından izlenmez. Kalıcı özetler `qa/STEP-1B-MOBILE-ADAPTATION-REPORT.md` ve `qa/STEP-2-SPLINE-QA-REPORT.md`; Adım 2 donanım/network kanıtı `qa/network/step-2/` altındadır.
 
 ## Environment variables
 

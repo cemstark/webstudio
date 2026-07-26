@@ -20,7 +20,8 @@ function sceneFailedThisSession() {
 function localQaProfileOverride(): ExperienceProfile | null {
   try {
     const localHost = ["127.0.0.1", "localhost"].includes(window.location.hostname);
-    return localHost && new URLSearchParams(window.location.search).get("qa-experience") === "lite" ? "lite" : null;
+    const requestedProfile = new URLSearchParams(window.location.search).get("qa-experience");
+    return localHost && (requestedProfile === "full" || requestedProfile === "lite") ? requestedProfile : null;
   } catch {
     return null;
   }
@@ -35,19 +36,28 @@ export function rememberSceneFailure() {
   }
 }
 
-export function canCreateWebGLContext() {
+type WebGLCapability = "hardware" | "software" | "none";
+
+function detectWebGLCapability(): WebGLCapability {
   try {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true })
       ?? canvas.getContext("webgl", { failIfMajorPerformanceCaveat: true });
 
-    if (!context) return false;
-    const extension = context.getExtension("WEBGL_lose_context");
-    extension?.loseContext();
-    return true;
+    if (!context) return "none";
+    const rendererInfo = context.getExtension("WEBGL_debug_renderer_info");
+    const renderer = rendererInfo
+      ? String(context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL))
+      : "";
+    context.getExtension("WEBGL_lose_context")?.loseContext();
+    return /swiftshader|llvmpipe|software renderer/i.test(renderer) ? "software" : "hardware";
   } catch {
-    return false;
+    return "none";
   }
+}
+
+export function canCreateWebGLContext() {
+  return detectWebGLCapability() !== "none";
 }
 
 export function detectBaselineExperienceProfile(): BaselineExperienceProfile {
@@ -68,7 +78,10 @@ export function detectBaselineExperienceProfile(): BaselineExperienceProfile {
 export function detectExperienceProfile(): ExperienceProfile {
   const baseline = detectBaselineExperienceProfile();
   if (baseline !== "candidate") return baseline;
-  return canCreateWebGLContext() ? "full" : "none";
+  const capability = detectWebGLCapability();
+  if (capability === "none") return "none";
+  if (capability === "software" && !window.__CEM_SPLINE_TEST_MOCK__) return "lite";
+  return "full";
 }
 
 export function detectExperienceInputMode(): ExperienceInputMode {

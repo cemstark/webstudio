@@ -186,6 +186,7 @@
 
 .faq { padding-block: clamp(8rem, 12vw, 13rem); background: #fff; }
 .final { min-height: 100svh; min-height: 100dvh; display: grid; align-items: end; overflow: clip; background: linear-gradient(90deg, rgb(7 8 12 / .98) 0 46%, rgb(7 8 12 / .82) 68%, rgb(7 8 12 / .44)), #07080c; color: white; }
+.final::before { content: ""; position: absolute; z-index: 2; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 22%, rgb(7 8 12 / .62) 39%, rgb(7 8 12 / .48) 76%, transparent 94%); }
 .finalInner { display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; padding-top: 10rem; padding-bottom: max(5rem, env(safe-area-inset-bottom)); }
 .finalInner .eyebrow { margin-top: .7rem; }
 .finalInner h2 { max-width: 10ch; font-size: clamp(4.5rem, 9.5vw, 10.5rem); line-height: .84; }

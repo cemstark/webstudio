@@ -15,6 +15,7 @@ type BrowserFixture = {
   reducedMotion?: boolean;
   saveData?: boolean;
   webgl?: boolean;
+  webglRenderer?: string;
 };
 
 function installBrowserFixture(fixture: BrowserFixture = {}) {
@@ -28,8 +29,10 @@ function installBrowserFixture(fixture: BrowserFixture = {}) {
           ? fixture.hover !== false
           : false,
   }));
+  const debugRendererInfo = { UNMASKED_RENDERER_WEBGL: 0x9246 };
   const context = fixture.webgl === false ? null : {
-    getExtension: () => ({ loseContext: vi.fn() }),
+    getExtension: (name: string) => name === "WEBGL_debug_renderer_info" ? debugRendererInfo : { loseContext: vi.fn() },
+    getParameter: () => fixture.webglRenderer ?? "ANGLE (NVIDIA)",
   };
 
   vi.stubGlobal("navigator", {
@@ -82,10 +85,21 @@ describe("experience capability policy", () => {
     expect(detectExperienceProfile()).toBe("none");
   });
 
+  it("uses lite when WebGL is backed by a software renderer", () => {
+    installBrowserFixture({ webglRenderer: "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device))" });
+    expect(detectExperienceProfile()).toBe("lite");
+  });
+
   it("supports a localhost-only lite override for repeatable performance QA", () => {
     installBrowserFixture();
     Object.assign(window.location, { hostname: "localhost", search: "?qa-experience=lite" });
     expect(detectBaselineExperienceProfile()).toBe("lite");
+  });
+
+  it("supports a localhost-only full override for isolated 3D QA", () => {
+    installBrowserFixture({ webgl: false });
+    Object.assign(window.location, { hostname: "localhost", search: "?qa-experience=full" });
+    expect(detectExperienceProfile()).toBe("full");
   });
 
   it("remembers a scene failure for the rest of the tab session", () => {

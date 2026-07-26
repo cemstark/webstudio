@@ -3,12 +3,12 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
 const port = 3212;
 const baseUrl = `http://127.0.0.1:${port}`;
-const outputDirectory = "qa/lighthouse";
+const outputDirectory = "qa/lighthouse/step-2/after";
 const runsPerProfile = 3;
 const pages = [
-  { name: "home-mobile-full", path: "/" },
+  { name: "home-mobile-full", path: "/?qa-experience=full" },
   { name: "home-mobile-lite", path: "/?qa-experience=lite" },
-  { name: "home-desktop-full", path: "/", preset: "desktop" },
+  { name: "home-desktop-full", path: "/?qa-experience=full", preset: "desktop" },
   { name: "pricing-mobile", path: "/fiyatlandirma" },
 ];
 const profileFilter = new Set((process.env.LIGHTHOUSE_PROFILES ?? "").split(",").filter(Boolean));
