@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const { slug } = await params;
   const project = getProject(slug);
   if (!project) return {};
-  return pageMetadata(project.name, project.description, `/projeler/${project.slug}`);
+  return pageMetadata(project.name, project.description, `/projeler/${project.slug}`, project.image?.src);
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
@@ -54,7 +54,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <section className="section">
         <div className="container">
           {project.image ? (
-            <Image className="projectDetailImage" src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} priority sizes="(min-width: 1280px) 1200px, 100vw" />
+            <Image className="projectDetailImage" src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 1344px) 1216px, calc(100vw - 2.5rem)" />
           ) : (
             <div className="projectVisual projectDetailPlaceholder"><span className="projectPlaceholder"><span>{project.name}</span><small>Arşiv / içerik hazırlanıyor</small></span></div>
           )}

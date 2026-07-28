@@ -6,10 +6,10 @@ export const getSiteUrl = () => {
   try { return new URL(rawUrl); } catch { return new URL(site.defaultUrl); }
 };
 
-export const pageMetadata = (title: string, description: string, path: string): Metadata => ({
+export const pageMetadata = (title: string, description: string, path: string, image?: string): Metadata => ({
   title, description, alternates: { canonical: path },
-  openGraph: { title, description, url: path, type: "website", locale: site.locale, siteName: site.name },
-  twitter: { card: "summary_large_image", title, description },
+  openGraph: { title, description, url: path, type: "website", locale: site.locale, siteName: site.name, images: image ? [image] : undefined },
+  twitter: { card: "summary_large_image", title, description, images: image ? [image] : undefined },
 });
 
 export const breadcrumbSchema = (items: readonly { name: string; path: string }[]) => ({

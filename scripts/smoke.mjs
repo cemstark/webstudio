@@ -5,7 +5,10 @@ const baseUrl = `http://127.0.0.1:${port}`;
 const routes = [
   "/", "/hizmetler", "/hizmetler/web-tasarim", "/hizmetler/seo",
   "/hizmetler/mobil-uygulama", "/hizmetler/e-ticaret", "/fiyatlandirma",
-  "/projeler", "/projeler/vela-windsurfing", "/surec", "/hakkimda",
+  "/projeler", "/projeler/vela-windsurfing", "/projeler/aysaworks",
+  "/projeler/bluekim", "/projeler/drnekinoto-servis", "/projeler/cemwebstudio",
+  "/projeler/erp-is-yonetim-paneli", "/projeler/atlas-panel-script",
+  "/projeler/drn-servis-paneli", "/surec", "/hakkimda",
   "/iletisim", "/gizlilik", "/cerez-politikasi", "/sitemap.xml", "/robots.txt",
 ];
 

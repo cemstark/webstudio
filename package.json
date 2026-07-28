@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:smoke": "node scripts/smoke.mjs",
-    "test:e2e": "playwright test tests/e2e/experience.spec.ts --project=chromium",
-    "test:cross-browser": "playwright test tests/e2e/cross-browser.spec.ts --project=firefox --project=webkit",
+    "test:e2e": "playwright test tests/e2e/experience.spec.ts tests/e2e/project-assets.spec.ts --project=chromium",
+    "test:cross-browser": "playwright test tests/e2e/cross-browser.spec.ts tests/e2e/project-assets.spec.ts --project=firefox --project=webkit",
     "qa:spline-cross-browser": "node scripts/spline-cross-browser.mjs",
     "qa:screenshots": "playwright test tests/e2e/visual.spec.ts --project=chromium-hardware",
     "qa:lighthouse": "node scripts/lighthouse.mjs"

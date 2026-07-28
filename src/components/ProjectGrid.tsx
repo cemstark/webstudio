@@ -2,14 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/content/projects";
 
-export function ProjectGrid({ items, priorityFirst = false, editorial = false }: { items: readonly Project[]; priorityFirst?: boolean; editorial?: boolean }) {
+export function ProjectGrid({ items, editorial = false }: { items: readonly Project[]; editorial?: boolean }) {
   return (
     <div className={`projectGrid ${editorial ? "projectGridEditorial" : ""}`}>
-      {items.map((project, index) => (
+      {items.map((project) => (
         <article className="projectCard" key={project.slug}>
           <Link className="projectVisual" href={`/projeler/${project.slug}`} aria-label={`${project.name} projesini gör`}>
             {project.image ? (
-              <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 961px) 50vw, 100vw" priority={priorityFirst && index === 0} />
+              <Image
+                src={project.image.src}
+                alt={project.image.alt}
+                width={project.image.width}
+                height={project.image.height}
+                sizes="(min-width: 1344px) 608px, (min-width: 961px) calc(50vw - 6rem), calc(100vw - 2.5rem)"
+                style={{ objectPosition: project.image.position }}
+              />
             ) : (
               <span className="projectPlaceholder"><span>{project.name}</span><small>Arşiv / içerik hazırlanıyor</small></span>
             )}

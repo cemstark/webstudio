@@ -117,7 +117,7 @@ export default function Home() {
           </div>
           <article className={styles.featuredProject} data-reveal>
             <Link className={styles.velaVisual} href={`/projeler/${vela.slug}`} aria-label="Vela Windsurfing proje detayını gör">
-              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1100px) 72vw, (min-width: 700px) 86vw, 100vw" /> : null}
+              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1344px) 1056px, (min-width: 700px) 86vw, calc(100vw - 2.5rem)" style={{ objectPosition: vela.image.position }} /> : null}
               <span>Projeyi gör ↗</span>
             </Link>
             <div className={styles.projectInfo}>
@@ -136,9 +136,10 @@ export default function Home() {
             {archiveProjects.map((project, index) => (
               <article className={styles.archiveCard} key={project.slug} data-reveal>
                 <Link href={`/projeler/${project.slug}`} className={styles.archiveVisual}>
+                  {project.image ? <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 1344px) 552px, (min-width: 641px) calc(50vw - 4rem), calc(100vw - 2.5rem)" style={{ objectPosition: project.image.position }} /> : null}
                   <span className="micro">0{index + 2} · ARŞİV</span>
                   <strong>{project.name}</strong>
-                  <small>İçerik hazırlanıyor</small>
+                  <small>{project.missingAssets ? "İçerik hazırlanıyor" : "Projeyi gör ↗"}</small>
                 </Link>
                 <p>{project.category}</p>
               </article>

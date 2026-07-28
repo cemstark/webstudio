@@ -205,7 +205,7 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
   .cardGrid, .projectGrid, .quoteGrid, .split, .footerGrid { grid-template-columns: 1fr; }
   .projectCard:nth-child(3n), .footerGrid > div:last-child { grid-column: auto; }
   .projectGridEditorial .projectCard:first-child { grid-column: auto; }
-  .projectGridEditorial .projectCard:first-child .projectVisual { aspect-ratio: 4 / 3; }
+  .projectGridEditorial .projectCard:first-child .projectVisual { aspect-ratio: 16 / 10; }
   .serviceCard { min-height: 19rem; }
   .projectMeta { align-items: flex-start; flex-direction: column; gap: .2rem; }
   .processGrid li { min-height: auto; border-right: 0; }
