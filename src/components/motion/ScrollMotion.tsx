@@ -1,23 +1,38 @@
 "use client";
 
 import { useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useGsapContext } from "@/lib/animation/useGsapContext";
 import type { MotionRuntime } from "@/lib/animation/runtime";
-import { duration, ease, parallax, revealFrom, revealTo, scrollTriggerDefaults, stagger } from "@/lib/animation/presets";
+import {
+  ease,
+  duration,
+  maskedLineFrom,
+  maskedLineTo,
+  parallax,
+  revealFrom,
+  revealTo,
+  scrollTriggerDefaults,
+  stagger,
+} from "@/lib/animation/presets";
 
 const MOBILE_QUERY = "(max-width: 47.99rem)";
 
 /**
- * Scroll choreography for the homepage.
+ * The site's scroll choreography, in one place so every route moves the same way.
  *
  * Deliberately disjoint from MotionObserver: nothing here selects `[data-reveal]`, so the
  * two systems never animate the same element. Everything animates transform and opacity
  * only, so no step can trigger layout.
+ *
+ * The vocabulary is four attributes, and a page opts in by using them:
+ * `data-parallax` drift, `data-stagger` grouped entrance, `data-mask-lines` headings that
+ * ride up from behind their own mask, `data-progress-line` a line that fills as you read.
  */
-function setupHomeMotion({ gsap, ScrollTrigger }: MotionRuntime, scope: HTMLElement) {
+function setupScrollMotion({ gsap, ScrollTrigger }: MotionRuntime, scope: HTMLElement) {
   const isMobile = window.matchMedia(MOBILE_QUERY).matches;
 
-  // Showcase cards drift at slightly different speeds so the grid reads as depth, not tiles.
+  // Cards drift at slightly different speeds so a grid reads as depth, not tiles.
   const travel = isMobile ? parallax.mobilePx : parallax.desktopPx;
   for (const card of scope.querySelectorAll<HTMLElement>("[data-parallax]")) {
     const factor = Number(card.dataset.parallax) || 1;
@@ -46,9 +61,9 @@ function setupHomeMotion({ gsap, ScrollTrigger }: MotionRuntime, scope: HTMLElem
   for (const heading of scope.querySelectorAll<HTMLElement>("[data-mask-lines]")) {
     gsap.fromTo(
       heading.querySelectorAll(":scope > span > span"),
-      { yPercent: 100 },
+      maskedLineFrom,
       {
-        yPercent: 0,
+        ...maskedLineTo,
         duration: duration.slow,
         ease: ease.expressive,
         stagger: stagger.loose,
@@ -57,7 +72,7 @@ function setupHomeMotion({ gsap, ScrollTrigger }: MotionRuntime, scope: HTMLElem
     );
   }
 
-  // The process line fills as the reader moves through the steps.
+  // A progress line fills as the reader moves through the steps it belongs to.
   for (const line of scope.querySelectorAll<HTMLElement>("[data-progress-line]")) {
     const bar = line.querySelector(":scope > span");
     if (!bar) continue;
@@ -75,12 +90,15 @@ function setupHomeMotion({ gsap, ScrollTrigger }: MotionRuntime, scope: HTMLElem
   ScrollTrigger.refresh();
 }
 
-export function HomeMotion() {
+export function ScrollMotion() {
   const scopeRef = useRef<HTMLElement | null>(null);
+  const pathname = usePathname();
 
-  useGsapContext(scopeRef, setupHomeMotion);
+  // A client-side navigation keeps <main> and replaces its children, so the context has
+  // to be rebuilt against the new DOM rather than left pointing at removed nodes.
+  useGsapContext(scopeRef, setupScrollMotion, pathname);
 
-  // The scope must be the page wrapper so the selectors can reach every section.
+  // The scope must be the route wrapper so the selectors can reach every section.
   // A callback ref resolves it during render, before useGsapContext's effect runs.
   return <div ref={(node) => { scopeRef.current = node?.parentElement ?? null; }} hidden />;
 }

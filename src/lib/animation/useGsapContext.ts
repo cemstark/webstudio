@@ -14,8 +14,11 @@ type ScopedSetup = (runtime: MotionRuntime, scope: HTMLElement) => void;
  * the DOM to its authored state and leaves no orphaned scroll listeners behind.
  * Under `prefers-reduced-motion` the setup never runs, so elements keep the static
  * appearance the stylesheet gives them.
+ *
+ * `resetKey` re-runs the setup when the scope element survives but its contents are
+ * replaced — a client-side route change keeps `<main>` and swaps everything inside it.
  */
-export function useGsapContext(scopeRef: RefObject<HTMLElement | null>, setup: ScopedSetup) {
+export function useGsapContext(scopeRef: RefObject<HTMLElement | null>, setup: ScopedSetup, resetKey?: string) {
   useEffect(() => {
     const scope = scopeRef.current;
     if (!scope || prefersReducedMotion()) return;
@@ -31,5 +34,5 @@ export function useGsapContext(scopeRef: RefObject<HTMLElement | null>, setup: S
     });
     // `setup` is expected to be a stable module-level function.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scopeRef]);
+  }, [scopeRef, resetKey]);
 }

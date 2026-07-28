@@ -6,7 +6,7 @@ export function PricingCards({ offers, service }: { offers: readonly PricedOffer
   return (
     <div className="pricingGrid">
       {offers.map((offer, index) => (
-        <article className={`pricingCard ${index === 1 ? "featuredOffer" : ""}`} key={offer.code}>
+        <article className={`pricingCard ${index === 1 ? "featuredOffer" : ""}`} key={offer.code} data-stagger>
           <div>
             <p className="micro">{offer.code}</p>
             <h3>{offer.name}</h3>

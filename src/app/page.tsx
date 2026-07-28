@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ExperienceIntro } from "@/components/experience/ExperienceIntro";
 import { ExperienceShell } from "@/components/experience/ExperienceShell";
 import { FaqList } from "@/components/FaqList";
-import { HomeMotion } from "@/components/motion/HomeMotion";
 import { MobileActionBar } from "@/components/MobileActionBar";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { PricingSwitcher } from "@/components/PricingSwitcher";
@@ -66,7 +65,6 @@ export default function Home() {
       <JsonLd data={homeServicesSchema} />
       <ExperienceIntro />
       <ExperienceShell />
-      <HomeMotion />
       <MobileActionBar />
       <div className={styles.scrollRail} aria-hidden="true"><span /></div>
 

@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { MotionObserver } from "@/components/motion/MotionObserver";
 import { RouteTransition } from "@/components/motion/RouteTransition";
+import { ScrollMotion } from "@/components/motion/ScrollMotion";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { site } from "@/content/site";
 import { getSiteUrl, JsonLd } from "@/lib/seo";
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SmoothScroll />
         <RouteTransition />
         <SiteHeader />
-        <main id="main-content" tabIndex={-1}>{children}</main>
+        <main id="main-content" tabIndex={-1}><ScrollMotion />{children}</main>
         <SiteFooter />
       </body>
     </html>

@@ -2,7 +2,7 @@ type SectionHeadingProps = { eyebrow: string; title: string; description?: strin
 
 export function SectionHeading({ eyebrow, title, description }: SectionHeadingProps) {
   return (
-    <div className="sectionHeading">
+    <div className="sectionHeading" data-reveal>
       <p className="eyebrow">{eyebrow}</p>
       <h2>{title}</h2>
       {description && <p>{description}</p>}

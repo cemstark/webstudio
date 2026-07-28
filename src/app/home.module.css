@@ -68,13 +68,13 @@
   overflow-wrap: normal;
 }
 
-.heroTitle > span { display: block; overflow: hidden; }
-/* The line breaks are authored, so a browser must not add its own — not even at the
-   hyphen in "e-ticaret", which is where it wants to break first. */
-.heroTitle > span > span { display: block; white-space: nowrap; animation: introLine var(--motion-slow) var(--ease-expressive) both; }
+/* The shared `[data-intro-lines]` rule in globals.css owns the mask and the rise. These
+   add what only this headline needs: authored line breaks a browser must not re-wrap —
+   not even at the hyphen in "e-ticaret", which is where it wants to break first — and a
+   stagger down the three lines. */
+.heroTitle > span > span { white-space: nowrap; }
 .heroTitle > span:nth-child(2) > span { animation-delay: 90ms; }
 .heroTitle > span:nth-child(3) > span { animation-delay: 180ms; }
-@keyframes introLine { from { transform: translateY(100%); } to { transform: none; } }
 
 .heroLead {
   max-width: 34ch;
@@ -444,8 +444,7 @@
   letter-spacing: -.05em;
 }
 
-.finalInner h2 > span { display: block; overflow: hidden; }
-.finalInner h2 > span > span { display: block; }
+/* The mask and the block layout come from the shared `[data-mask-lines]` rule. */
 
 .finalLead { margin-top: 1rem; color: #b7bbc7; }
 .finalActions { display: grid; justify-items: start; gap: 1rem; margin-top: 1.8rem; }

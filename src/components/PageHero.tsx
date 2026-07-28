@@ -10,8 +10,11 @@ export function PageHero({ eyebrow, title, description, priceSignal, cta }: Page
           <p className="eyebrow">{eyebrow}</p>
           <p className="micro pageHeroIndex" aria-hidden="true">CWS / 2026</p>
         </div>
-        <h1 className="display">{title}</h1>
-        <div className="heroLower">
+        {/* CSS-driven like the homepage headline: this is the LCP element on every inner
+            route, so it must never wait for the motion runtime to download — and an
+            above-the-fold `data-reveal` would hide it until an observer callback lands. */}
+        <h1 className="display" data-intro-lines><span><span>{title}</span></span></h1>
+        <div className="heroLower" data-intro-fade>
           <p className="lead">{description}</p>
           <div>
             {priceSignal && <p className="priceSignal">{priceSignal}</p>}

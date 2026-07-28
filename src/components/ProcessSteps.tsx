@@ -6,5 +6,5 @@ export const processSteps = [
 ] as const;
 
 export function ProcessSteps() {
-  return <ol className="processGrid">{processSteps.map((step) => <li key={step.number}><span className="micro">{step.number}</span><h3>{step.title}</h3><p>{step.text}</p></li>)}</ol>;
+  return <ol className="processGrid">{processSteps.map((step) => <li key={step.number} data-stagger><span className="micro">{step.number}</span><h3>{step.title}</h3><p>{step.text}</p></li>)}</ol>;
 }

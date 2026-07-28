@@ -183,6 +183,27 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
 .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .motionReady [data-reveal] { opacity: 0; transform: translateY(2rem); }
 .motionReady [data-reveal][data-visible="true"] { opacity: 1; transform: none; transition: opacity .7s var(--ease-standard), transform .7s var(--ease-expressive); }
+
+/*
+ * Page entrance, in CSS rather than GSAP.
+ *
+ * These elements are above the fold on arrival: the heading is the LCP element and the
+ * lead paragraph sits right under it. Both would otherwise be held invisible until the
+ * motion runtime finished downloading, or until an IntersectionObserver callback landed.
+ * The scroll-linked vocabulary (`data-parallax`, `data-stagger`, `data-mask-lines`,
+ * `data-progress-line`) stays with GSAP, where nothing depends on it painting on time.
+ */
+/* The padding/margin pair gives descenders room inside the mask without moving anything:
+   these headings run a line-height below 1, so `overflow: hidden` alone shears the ğ and y. */
+[data-intro-lines] > span { display: block; overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+[data-intro-lines] > span > span { display: block; animation: introRise var(--motion-slow) var(--ease-expressive) both; }
+[data-intro-fade] { animation: introFade var(--motion-slow) 140ms var(--ease-standard) both; }
+@keyframes introRise { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes introFade { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: none; } }
+
+/* Headings that ride up from behind their own mask once scrolled to. */
+[data-mask-lines] > span { display: block; overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+[data-mask-lines] > span > span { display: block; }
 .routeTransition { position: fixed; inset: 0; z-index: 200; pointer-events: none; background: var(--blue); transform: scaleY(0); transform-origin: top; }
 .routeTransition.isActive { animation: routeCurtain .58s var(--ease-expressive) both; }
 @keyframes routeCurtain { 0% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
@@ -227,5 +248,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .motionReady [data-reveal] { opacity: 1; transform: none; }
+  /* The blanket rule above shortens durations but not delays, so name these explicitly
+     rather than leaving the lead paragraph invisible for its stagger. */
+  [data-intro-lines] > span > span, [data-intro-fade] { animation: none; }
   .routeTransition { display: none; }
 }

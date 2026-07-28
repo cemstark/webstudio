@@ -6,7 +6,7 @@ export function ProjectGrid({ items, editorial = false }: { items: readonly Proj
   return (
     <div className={`projectGrid ${editorial ? "projectGridEditorial" : ""}`}>
       {items.map((project) => (
-        <article className="projectCard" key={project.slug}>
+        <article className="projectCard" key={project.slug} data-stagger>
           <Link className="projectVisual" href={`/projeler/${project.slug}`} aria-label={`${project.name} projesini gör`}>
             {project.image ? (
               <Image
