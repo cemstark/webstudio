@@ -1,0 +1,194 @@
+{
+  "label": "faz2",
+  "generatedAt": "2026-07-28T01:03:45.372Z",
+  "routes": {
+    "/": {
+      "layout": [
+        {
+          "name": "mobile-360",
+          "width": 360,
+          "height": 800,
+          "scrollHeight": 14023,
+          "clientHeight": 800,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.008,
+          "screens": 17.53
+        },
+        {
+          "name": "mobile-390",
+          "width": 390,
+          "height": 844,
+          "scrollHeight": 14145,
+          "clientHeight": 844,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.062,
+          "screens": 16.76
+        },
+        {
+          "name": "mobile-430",
+          "width": 430,
+          "height": 932,
+          "scrollHeight": 14301,
+          "clientHeight": 932,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.134,
+          "screens": 15.34
+        },
+        {
+          "name": "mobile-375x667",
+          "width": 375,
+          "height": 667,
+          "scrollHeight": 13597,
+          "clientHeight": 667,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.035,
+          "screens": 20.39
+        },
+        {
+          "name": "desktop-1440",
+          "width": 1440,
+          "height": 900,
+          "scrollHeight": 14416,
+          "clientHeight": 900,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 17.952,
+          "screens": 16.02
+        },
+        {
+          "name": "desktop-1920",
+          "width": 1920,
+          "height": 1080,
+          "scrollHeight": 16952,
+          "clientHeight": 1080,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 18,
+          "screens": 15.7
+        }
+      ],
+      "scriptWeight": {
+        "requestCount": 9,
+        "totalTransferBytes": 160318,
+        "splineTransferBytes": 0,
+        "appTransferBytes": 160318,
+        "appRawBytes": 553173,
+        "scripts": [
+          {
+            "transferBytes": 70827,
+            "rawBytes": 227315,
+            "url": "/_next/static/chunks/3gzxhq9iq6efl.js"
+          },
+          {
+            "transferBytes": 40352,
+            "rawBytes": 150470,
+            "url": "/_next/static/chunks/2-5nk792mwq2y.js"
+          },
+          {
+            "transferBytes": 12823,
+            "rawBytes": 54646,
+            "url": "/_next/static/chunks/14mrh2-p_w84d.js"
+          },
+          {
+            "transferBytes": 9195,
+            "rawBytes": 44414,
+            "url": "/_next/static/chunks/27jktro2p5rq9.js"
+          },
+          {
+            "transferBytes": 7639,
+            "rawBytes": 21429,
+            "url": "/_next/static/chunks/0_tssuz62aenl.js"
+          },
+          {
+            "transferBytes": 7463,
+            "rawBytes": 23985,
+            "url": "/_next/static/chunks/3jvkbm-wxvaor.js"
+          },
+          {
+            "transferBytes": 6417,
+            "rawBytes": 16957,
+            "url": "/_next/static/chunks/3vm132m5s8w5j.js"
+          },
+          {
+            "transferBytes": 4151,
+            "rawBytes": 10580,
+            "url": "/_next/static/chunks/turbopack-1u8fqx-d1qxkz.js"
+          },
+          {
+            "transferBytes": 1451,
+            "rawBytes": 3377,
+            "url": "/_next/static/chunks/05-c3ty_6dwfk.js"
+          }
+        ]
+      },
+      "scriptWeightWithMotion": {
+        "requestCount": 12,
+        "totalTransferBytes": 210354,
+        "splineTransferBytes": 0,
+        "appTransferBytes": 210354,
+        "appRawBytes": 685594,
+        "scripts": [
+          {
+            "transferBytes": 70827,
+            "rawBytes": 227315,
+            "url": "/_next/static/chunks/3gzxhq9iq6efl.js"
+          },
+          {
+            "transferBytes": 40352,
+            "rawBytes": 150470,
+            "url": "/_next/static/chunks/2-5nk792mwq2y.js"
+          },
+          {
+            "transferBytes": 27231,
+            "rawBytes": 70637,
+            "url": "/_next/static/chunks/3dewhjypacr5m.js"
+          },
+          {
+            "transferBytes": 17473,
+            "rawBytes": 43374,
+            "url": "/_next/static/chunks/1is0gg5e6lopl.js"
+          },
+          {
+            "transferBytes": 12823,
+            "rawBytes": 54646,
+            "url": "/_next/static/chunks/14mrh2-p_w84d.js"
+          },
+          {
+            "transferBytes": 9195,
+            "rawBytes": 44414,
+            "url": "/_next/static/chunks/27jktro2p5rq9.js"
+          },
+          {
+            "transferBytes": 7639,
+            "rawBytes": 21429,
+            "url": "/_next/static/chunks/0_tssuz62aenl.js"
+          },
+          {
+            "transferBytes": 7463,
+            "rawBytes": 23985,
+            "url": "/_next/static/chunks/3jvkbm-wxvaor.js"
+          },
+          {
+            "transferBytes": 6417,
+            "rawBytes": 16957,
+            "url": "/_next/static/chunks/3vm132m5s8w5j.js"
+          },
+          {
+            "transferBytes": 5332,
+            "rawBytes": 18410,
+            "url": "/_next/static/chunks/1n1wrlbf_viss.js"
+          },
+          {
+            "transferBytes": 4151,
+            "rawBytes": 10580,
+            "url": "/_next/static/chunks/turbopack-1u8fqx-d1qxkz.js"
+          },
+          {
+            "transferBytes": 1451,
+            "rawBytes": 3377,
+            "url": "/_next/static/chunks/05-c3ty_6dwfk.js"
+          }
+        ]
+      },
+      "motionRuntimeTransferBytes": 50036
+    }
+  }
+}

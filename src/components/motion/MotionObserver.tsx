@@ -2,13 +2,18 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { prefersReducedMotion } from "@/lib/webgl";
 
+/**
+ * Owns the one-shot "enter and stay" reveal for `[data-reveal]` elements on every page.
+ * Scroll-linked motion (parallax, masked headings, progress lines) belongs to the GSAP
+ * layer instead, which never targets `[data-reveal]` so the two cannot fight.
+ */
 export function MotionObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) return;
+    if (prefersReducedMotion()) return;
 
     const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
     if (targets.length === 0) return;

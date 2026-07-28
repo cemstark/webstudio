@@ -67,8 +67,8 @@ async function measureLayout(browser, route) {
 }
 
 /** First-load script weight. Transfer bytes are the compressed wire size the budget is written against. */
-async function measureScriptWeight(browser, route) {
-  const context = await browser.newContext({ ...devices["iPhone 13"], reducedMotion: "reduce" });
+async function measureScriptWeight(browser, route, reducedMotion = "reduce") {
+  const context = await browser.newContext({ ...devices["iPhone 13"], reducedMotion });
   const page = await context.newPage();
   const scripts = [];
   page.on("response", async (response) => {
@@ -85,6 +85,9 @@ async function measureScriptWeight(browser, route) {
     } catch {}
   });
   await page.goto(`${baseUrl}${route}`, { waitUntil: "networkidle" });
+  // The motion runtime loads on demand, so give the deferred chunks time to arrive.
+  await page.waitForTimeout(2_500);
+  await page.mouse.wheel(0, 600);
   await page.waitForTimeout(1_500);
   await context.close();
 
@@ -109,9 +112,14 @@ try {
   const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
   const report = { label, generatedAt: new Date().toISOString(), routes: {} };
   for (const route of routes) {
+    const reducedMotionWeight = await measureScriptWeight(browser, route, "reduce");
+    const fullMotionWeight = await measureScriptWeight(browser, route, "no-preference");
     report.routes[route] = {
       layout: await measureLayout(browser, route),
-      scriptWeight: await measureScriptWeight(browser, route),
+      scriptWeight: reducedMotionWeight,
+      scriptWeightWithMotion: fullMotionWeight,
+      // What the animation stack actually costs a visitor who has motion enabled.
+      motionRuntimeTransferBytes: fullMotionWeight.appTransferBytes - reducedMotionWeight.appTransferBytes,
     };
   }
   await browser.close();
@@ -122,10 +130,14 @@ try {
     console.table(report.routes[route].layout.map(({ name, scrollHeight, clientHeight, screens, horizontalOverflow, bodyFontSizePx }) => ({
       name, scrollHeight, clientHeight, screens, horizontalOverflow, bodyFontSizePx,
     })));
-    const { requestCount, totalTransferBytes, splineTransferBytes, appTransferBytes, appRawBytes } = report.routes[route].scriptWeight;
+    const { requestCount, appTransferBytes } = report.routes[route].scriptWeight;
+    const { motionRuntimeTransferBytes, scriptWeightWithMotion } = report.routes[route];
     console.info(
-      `scripts=${requestCount} transferKB=${(totalTransferBytes / 1024).toFixed(1)} appTransferKB=${(appTransferBytes / 1024).toFixed(1)}`
-      + ` splineTransferKB=${(splineTransferBytes / 1024).toFixed(1)} appRawKB=${(appRawBytes / 1024).toFixed(1)}`,
+      `firstLoad: scripts=${requestCount} appTransferKB=${(appTransferBytes / 1024).toFixed(1)} (reduced-motion, Spline excluded)`,
+    );
+    console.info(
+      `withMotion: scripts=${scriptWeightWithMotion.requestCount} appTransferKB=${(scriptWeightWithMotion.appTransferBytes / 1024).toFixed(1)}`
+      + ` → gsap+lenis netKB=${(motionRuntimeTransferBytes / 1024).toFixed(1)}`,
     );
   }
 } finally {

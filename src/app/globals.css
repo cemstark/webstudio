@@ -17,6 +17,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+/* Lenis owns the easing once it is running; two smooth-scroll engines fight over anchors. */
+html[data-lenis="on"] { scroll-behavior: auto; }
 body { background: var(--offwhite); color: var(--ink); font-family: var(--font-sans), Arial, sans-serif; font-size: clamp(1rem, .96rem + .18vw, 1.125rem); line-height: 1.65; -webkit-font-smoothing: antialiased; }
 body, main { min-width: 0; }
 body { overflow-x: clip; }

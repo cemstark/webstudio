@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { MotionObserver } from "@/components/motion/MotionObserver";
 import { RouteTransition } from "@/components/motion/RouteTransition";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { site } from "@/content/site";
 import { getSiteUrl, JsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skipLink" href="#main-content">Ana içeriğe geç</a>
         <JsonLd data={businessSchema} />
         <MotionObserver />
+        <SmoothScroll />
         <RouteTransition />
         <SiteHeader />
         <main id="main-content" tabIndex={-1}>{children}</main>

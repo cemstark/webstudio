@@ -9,6 +9,15 @@ type NavigatorWithHints = Navigator & {
   deviceMemory?: number;
 };
 
+/**
+ * Single source of truth for the reduced-motion preference. The experience profile,
+ * the reveal observer and the scroll animation layer all read it from here so they
+ * can never disagree about whether motion is allowed.
+ */
+export function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 function sceneFailedThisSession() {
   try {
     return window.sessionStorage.getItem(SPLINE_SESSION_FAILURE_KEY) === "1";
@@ -62,10 +71,9 @@ export function canCreateWebGLContext() {
 
 export function detectBaselineExperienceProfile(): BaselineExperienceProfile {
   const hints = navigator as NavigatorWithHints;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const qaOverride = localQaProfileOverride();
 
-  if (reducedMotion || hints.connection?.saveData || sceneFailedThisSession()) return "none";
+  if (prefersReducedMotion() || hints.connection?.saveData || sceneFailedThisSession()) return "none";
   if (qaOverride === "lite") return "lite";
   // Keep the full QA path on the same intent/idle scheduler as production.
   // The override selects the renderer tier, not an artificially eager load.
