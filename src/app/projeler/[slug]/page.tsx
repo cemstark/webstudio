@@ -53,8 +53,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <PageHero eyebrow={`${project.year ?? "ARŞİV"} · ${project.statusLabel}`} title={project.name} description={project.description} />
       <section className="section">
         <div className="container">
+          {/* The project's main visual sits directly under the page hero, so it is the LCP
+              candidate on this route: it loads eagerly rather than waiting for a lazy-load
+              heuristic to notice it. */}
           {project.image ? (
-            <Image className="projectDetailImage" src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 1344px) 1216px, calc(100vw - 2.5rem)" />
+            <Image className="projectDetailImage" src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} priority sizes="(min-width: 1344px) 1216px, calc(100vw - 2.5rem)" />
           ) : (
             <div className="projectVisual projectDetailPlaceholder"><span className="projectPlaceholder"><span>{project.name}</span><small>Arşiv / içerik hazırlanıyor</small></span></div>
           )}
