@@ -111,7 +111,11 @@ test("every changed project detail is responsive and exposes matching SEO metada
     });
 
     for (const project of projectAssets) {
-      const response = await page.goto(`/projeler/${project.slug}`);
+      // Waiting for `load` means waiting for the hero image too, and that image is eager
+      // because it is the LCP element. Every assertion below states its own wait, so the
+      // navigation only needs the document — otherwise each one blocks on an AVIF encode
+      // that nothing here is actually asking about.
+      const response = await page.goto(`/projeler/${project.slug}`, { waitUntil: "domcontentloaded" });
       expect(response?.status(), project.slug).toBe(200);
       await expect(page.getByRole("heading", { level: 1, name: project.name })).toBeVisible();
       const image = page.locator(".projectDetailImage");
