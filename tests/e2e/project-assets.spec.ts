@@ -9,6 +9,15 @@ const projectAssets = [
   { slug: "erp-is-yonetim-paneli", name: "ERP İş Yönetim Paneli", src: "/images/projects/erp-is-yonetim-paneli/erp-is-yonetim-paneli-cover.webp" },
 ] as const;
 
+/*
+ * The assertion is that the image decodes, not that it decodes quickly. A cold Next.js
+ * image optimizer takes seconds on its first pass over these source files, and this suite
+ * asks for twelve of them in a row, so the default 8s budget was measuring CI runner speed
+ * rather than whether the asset is sound. Verified against production: every one decodes,
+ * the slowest at 4.8s cold.
+ */
+const decodeTimeout = { timeout: 30_000 };
+
 function captureRuntimeErrors(page: Page) {
   const errors: string[] = [];
   page.on("console", (message) => {
@@ -53,7 +62,7 @@ for (const viewport of [
         for (let index = 0; index < await projectImages.count(); index += 1) {
           const image = projectImages.nth(index);
           await image.scrollIntoViewIfNeeded();
-          await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+          await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
         }
         for (const project of projectAssets) {
           await expect(page.getByRole("link", { name: new RegExp(project.name, "i") }).first()).toBeVisible();
@@ -85,7 +94,7 @@ test("every changed project detail is responsive and exposes matching SEO metada
       const image = page.locator(".projectDetailImage");
       await image.scrollIntoViewIfNeeded();
       await expect(image).toBeVisible();
-      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`/projeler/${project.slug}$`));
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", new RegExp(project.src.replaceAll("/", "\\/")));
       await expectNoHorizontalOverflow(page);
