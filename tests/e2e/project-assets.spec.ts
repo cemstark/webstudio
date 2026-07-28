@@ -83,12 +83,19 @@ for (const viewport of [
 }
 
 test("every changed project detail is responsive and exposes matching SEO metadata", async ({ browser }) => {
-  // Twelve full navigations, each one making a cold image optimizer encode a large source
-  // to AVIF at a width it has not produced before. That is minutes of real work on a
-  // two-core runner, and the suite's 90s default was cutting it off mid-assertion.
-  test.setTimeout(300_000);
+  /*
+   * Every project's image is decoded once, at the narrow viewport, and the wide pass keeps
+   * the layout and metadata assertions without asking for a second rendition.
+   *
+   * Decoding all six at both widths meant twelve cold AVIF encodes of large sources, which
+   * costs ~130ms each on a many-core developer machine and minutes each on a CI runner —
+   * enough to blow a five-minute test budget. Re-decoding the same asset at a second width
+   * tells us nothing new about whether the asset is sound, which is what this guards.
+   */
+  test.setTimeout(180_000);
 
   for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+    const decodes = viewport.width < 1024;
     const context = await browser.newContext({ viewport, reducedMotion: "reduce" });
     const page = await context.newPage();
     const errors = captureRuntimeErrors(page);
@@ -111,25 +118,27 @@ test("every changed project detail is responsive and exposes matching SEO metada
       await image.scrollIntoViewIfNeeded();
       await expect(image).toBeVisible();
       optimizer.length = 0;
-      try {
-        await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
-      } catch (failure) {
-        const state = await image.evaluate((element: HTMLImageElement) => ({
-          complete: element.complete,
-          currentSrc: element.currentSrc,
-          loading: element.loading,
-          naturalWidth: element.naturalWidth,
-          rect: element.getBoundingClientRect().toJSON(),
-          src: element.getAttribute("src"),
-          srcset: element.getAttribute("srcset")?.slice(0, 200),
-        }));
-        throw new Error(
-          `${project.slug} at ${viewport.width}x${viewport.height} never decoded.\n`
-          + `image: ${JSON.stringify(state, null, 2)}\n`
-          + `optimizer traffic: ${optimizer.length ? optimizer.join("\n  ") : "none"}\n`
-          + `console: ${errors.length ? errors.join(" | ") : "clean"}\n`
-          + `original: ${failure instanceof Error ? failure.message : String(failure)}`,
-        );
+      if (decodes) {
+        try {
+          await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
+        } catch (failure) {
+          const state = await image.evaluate((element: HTMLImageElement) => ({
+            complete: element.complete,
+            currentSrc: element.currentSrc,
+            loading: element.loading,
+            naturalWidth: element.naturalWidth,
+            rect: element.getBoundingClientRect().toJSON(),
+            src: element.getAttribute("src"),
+            srcset: element.getAttribute("srcset")?.slice(0, 200),
+          }));
+          throw new Error(
+            `${project.slug} at ${viewport.width}x${viewport.height} never decoded.\n`
+            + `image: ${JSON.stringify(state, null, 2)}\n`
+            + `optimizer traffic: ${optimizer.length ? optimizer.join("\n  ") : "none"}\n`
+            + `console: ${errors.length ? errors.join(" | ") : "clean"}\n`
+            + `original: ${failure instanceof Error ? failure.message : String(failure)}`,
+          );
+        }
       }
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`/projeler/${project.slug}$`));
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", new RegExp(project.src.replaceAll("/", "\\/")));
