@@ -87,6 +87,17 @@ test("every changed project detail is responsive and exposes matching SEO metada
     const context = await browser.newContext({ viewport, reducedMotion: "reduce" });
     const page = await context.newPage();
     const errors = captureRuntimeErrors(page);
+    // A bare "naturalWidth was 0" says nothing about which asset broke or why, which is the
+    // whole question when this only reproduces on one machine.
+    const optimizer: string[] = [];
+    page.on("response", (response) => {
+      const url = response.url();
+      if (url.includes("/_next/image")) optimizer.push(`${response.status()} ${url.slice(url.indexOf("/_next/image"))}`);
+    });
+    page.on("requestfailed", (request) => {
+      optimizer.push(`FAILED ${request.failure()?.errorText ?? "?"} ${request.url().slice(0, 160)}`);
+    });
+
     for (const project of projectAssets) {
       const response = await page.goto(`/projeler/${project.slug}`);
       expect(response?.status(), project.slug).toBe(200);
@@ -94,7 +105,27 @@ test("every changed project detail is responsive and exposes matching SEO metada
       const image = page.locator(".projectDetailImage");
       await image.scrollIntoViewIfNeeded();
       await expect(image).toBeVisible();
-      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
+      optimizer.length = 0;
+      try {
+        await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth), decodeTimeout).toBeGreaterThan(0);
+      } catch (failure) {
+        const state = await image.evaluate((element: HTMLImageElement) => ({
+          complete: element.complete,
+          currentSrc: element.currentSrc,
+          loading: element.loading,
+          naturalWidth: element.naturalWidth,
+          rect: element.getBoundingClientRect().toJSON(),
+          src: element.getAttribute("src"),
+          srcset: element.getAttribute("srcset")?.slice(0, 200),
+        }));
+        throw new Error(
+          `${project.slug} at ${viewport.width}x${viewport.height} never decoded.\n`
+          + `image: ${JSON.stringify(state, null, 2)}\n`
+          + `optimizer traffic: ${optimizer.length ? optimizer.join("\n  ") : "none"}\n`
+          + `console: ${errors.length ? errors.join(" | ") : "clean"}\n`
+          + `original: ${failure instanceof Error ? failure.message : String(failure)}`,
+        );
+      }
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`/projeler/${project.slug}$`));
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", new RegExp(project.src.replaceAll("/", "\\/")));
       await expectNoHorizontalOverflow(page);
