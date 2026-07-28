@@ -1,0 +1,124 @@
+{
+  "label": "baseline",
+  "generatedAt": "2026-07-28T00:56:10.372Z",
+  "routes": {
+    "/": {
+      "layout": [
+        {
+          "name": "mobile-360",
+          "width": 360,
+          "height": 800,
+          "scrollHeight": 13106,
+          "clientHeight": 800,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.008,
+          "screens": 16.38
+        },
+        {
+          "name": "mobile-390",
+          "width": 390,
+          "height": 844,
+          "scrollHeight": 13228,
+          "clientHeight": 844,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.062,
+          "screens": 15.67
+        },
+        {
+          "name": "mobile-430",
+          "width": 430,
+          "height": 932,
+          "scrollHeight": 13383,
+          "clientHeight": 932,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.134,
+          "screens": 14.36
+        },
+        {
+          "name": "mobile-375x667",
+          "width": 375,
+          "height": 667,
+          "scrollHeight": 12680,
+          "clientHeight": 667,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 16.035,
+          "screens": 19.01
+        },
+        {
+          "name": "desktop-1440",
+          "width": 1440,
+          "height": 900,
+          "scrollHeight": 13693,
+          "clientHeight": 900,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 17.952,
+          "screens": 15.21
+        },
+        {
+          "name": "desktop-1920",
+          "width": 1920,
+          "height": 1080,
+          "scrollHeight": 16218,
+          "clientHeight": 1080,
+          "horizontalOverflow": 0,
+          "bodyFontSizePx": 18,
+          "screens": 15.02
+        }
+      ],
+      "scriptWeight": {
+        "requestCount": 9,
+        "totalTransferBytes": 159651,
+        "splineTransferBytes": 0,
+        "appTransferBytes": 159651,
+        "appRawBytes": 551476,
+        "scripts": [
+          {
+            "transferBytes": 70827,
+            "rawBytes": 227315,
+            "url": "/_next/static/chunks/3gzxhq9iq6efl.js"
+          },
+          {
+            "transferBytes": 40352,
+            "rawBytes": 150470,
+            "url": "/_next/static/chunks/2-5nk792mwq2y.js"
+          },
+          {
+            "transferBytes": 12823,
+            "rawBytes": 54646,
+            "url": "/_next/static/chunks/14mrh2-p_w84d.js"
+          },
+          {
+            "transferBytes": 9195,
+            "rawBytes": 44414,
+            "url": "/_next/static/chunks/27jktro2p5rq9.js"
+          },
+          {
+            "transferBytes": 8136,
+            "rawBytes": 22807,
+            "url": "/_next/static/chunks/2g9l76ihcis1o.js"
+          },
+          {
+            "transferBytes": 7463,
+            "rawBytes": 23985,
+            "url": "/_next/static/chunks/3jvkbm-wxvaor.js"
+          },
+          {
+            "transferBytes": 5253,
+            "rawBytes": 13882,
+            "url": "/_next/static/chunks/2ggoiloc98mtf.js"
+          },
+          {
+            "transferBytes": 4151,
+            "rawBytes": 10580,
+            "url": "/_next/static/chunks/turbopack-1u8fqx-d1qxkz.js"
+          },
+          {
+            "transferBytes": 1451,
+            "rawBytes": 3377,
+            "url": "/_next/static/chunks/05-c3ty_6dwfk.js"
+          }
+        ]
+      }
+    }
+  }
+}
