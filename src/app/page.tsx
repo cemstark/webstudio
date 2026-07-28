@@ -77,8 +77,8 @@ export default function Home() {
             <p className={`${styles.kicker} micro`}>cemwebstudio · {site.location}</p>
             {/* CSS-driven so the largest text paints without waiting for the motion runtime. */}
             <h1 className={styles.heroTitle} data-intro-lines>
-              <span><span>Web sitesi, e-ticaret</span></span>
-              <span><span>ve mobil uygulama.</span></span>
+              <span><span>Web, e-ticaret,</span></span>
+              <span><span>mobil uygulama.</span></span>
               <span><span>Tek elden.</span></span>
             </h1>
             <p className={styles.heroLead}>

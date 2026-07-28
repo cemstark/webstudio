@@ -64,7 +64,9 @@
 }
 
 .heroTitle > span { display: block; overflow: hidden; }
-.heroTitle > span > span { display: block; animation: introLine var(--motion-slow) var(--ease-expressive) both; }
+/* The line breaks are authored, so a browser must not add its own — not even at the
+   hyphen in "e-ticaret", which is where it wants to break first. */
+.heroTitle > span > span { display: block; white-space: nowrap; animation: introLine var(--motion-slow) var(--ease-expressive) both; }
 .heroTitle > span:nth-child(2) > span { animation-delay: 90ms; }
 .heroTitle > span:nth-child(3) > span { animation-delay: 180ms; }
 @keyframes introLine { from { transform: translateY(100%); } to { transform: none; } }
