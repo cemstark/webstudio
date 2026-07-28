@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   detectBaselineExperienceProfile,
   detectExperienceInputMode,
@@ -14,11 +14,17 @@ import { robotMotion } from "@/lib/motion";
 export function useExperienceProfile() {
   const [profile, setProfile] = useState<ExperienceProfile>("none");
   const [inputMode, setInputMode] = useState<ExperienceInputMode>("touch");
+  /** True when the scene could run but is waiting for the visitor to ask for it. */
+  const [awaitingActivation, setAwaitingActivation] = useState(false);
+  const activateRef = useRef<() => void>(() => {});
 
   const disableExperience = useCallback(() => {
     rememberSceneFailure();
+    setAwaitingActivation(false);
     setProfile("none");
   }, []);
+
+  const activateScene = useCallback(() => activateRef.current(), []);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -30,12 +36,19 @@ export function useExperienceProfile() {
       const baseline = detectBaselineExperienceProfile();
       if (baseline !== "candidate") {
         window.performance.mark(`cem:experience-profile-${baseline}`);
+        setAwaitingActivation(false);
         setProfile(baseline);
+        return;
       }
+      // On touch devices the robot stays a poster until it is asked for: a phone should not
+      // spend its battery and data on a WebGL scene the visitor never requested. Reading the
+      // input mode here keeps the offer in sync when the baseline changes later on.
+      if (!activationStarted && detectExperienceInputMode() === "touch") setAwaitingActivation(true);
     };
     const activate = () => {
       if (activationStarted || detectBaselineExperienceProfile() !== "candidate") return;
       activationStarted = true;
+      setAwaitingActivation(false);
       const nextProfile = detectExperienceProfile();
       window.performance.mark(`cem:experience-profile-${nextProfile}`);
       setProfile(nextProfile);
@@ -47,11 +60,22 @@ export function useExperienceProfile() {
     const updateInputMode = () => setInputMode(detectExperienceInputMode());
     const intentEvents = ["pointerdown", "touchstart", "wheel"] as const;
 
+    activateRef.current = activate;
     updateBaseline();
     updateInputMode();
     reducedMotion.addEventListener("change", updateBaseline);
     coarsePointer.addEventListener("change", updateInputMode);
     hover.addEventListener("change", updateInputMode);
+
+    const stopWatchingMedia = () => {
+      reducedMotion.removeEventListener("change", updateBaseline);
+      coarsePointer.removeEventListener("change", updateInputMode);
+      hover.removeEventListener("change", updateInputMode);
+    };
+
+    // A touch visitor activates the scene from the poster button, so nothing is preloaded here.
+    if (detectExperienceInputMode() === "touch") return stopWatchingMedia;
+
     intentEvents.forEach((eventName) => window.addEventListener(eventName, activateFromIntent, { once: true, passive: true }));
     let idleHandle: number | null = null;
     const idleDelayHandle = window.setTimeout(() => {
@@ -63,14 +87,12 @@ export function useExperienceProfile() {
     }, robotMotion.idleLoadDelay);
 
     return () => {
-      reducedMotion.removeEventListener("change", updateBaseline);
-      coarsePointer.removeEventListener("change", updateInputMode);
-      hover.removeEventListener("change", updateInputMode);
+      stopWatchingMedia();
       intentEvents.forEach((eventName) => window.removeEventListener(eventName, activateFromIntent));
       window.clearTimeout(idleDelayHandle);
       if (idleHandle !== null && "cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
     };
   }, []);
 
-  return { disableExperience, inputMode, profile } as const;
+  return { activateScene, awaitingActivation, disableExperience, inputMode, profile } as const;
 }

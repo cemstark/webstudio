@@ -20,7 +20,7 @@ const activeSceneStages = new Set<RobotStage>(["hero", "services", "final"]);
 
 export function ExperienceShell() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { disableExperience, inputMode, profile } = useExperienceProfile();
+  const { activateScene, awaitingActivation, disableExperience, inputMode, profile } = useExperienceProfile();
   const [Scene, setScene] = useState<ComponentType<RobotSceneProps> | null>(null);
   const [sceneStatus, setSceneStatus] = useState<"poster" | "loading" | "ready" | "failed">("poster");
   const [stage, setStage] = useState<RobotStage>("hero");
@@ -74,26 +74,37 @@ export function ExperienceShell() {
   const active = pageVisible && activeSceneStages.has(stage);
 
   return (
-    <div
-      ref={rootRef}
-      className={styles.experienceLayer}
-      data-experience-profile={profile}
-      data-input-mode={inputMode}
-      data-robot-stage="hero"
-      data-scene-status={sceneStatus}
-      aria-hidden="true"
-    >
-      <RobotStoryController hostRef={rootRef} onStageChange={handleStageChange} />
-      <div className={styles.robotViewport}>
-        <RobotFallback />
-        {profile === "full" && Scene ? (
-          <Scene
-            active={active}
-            onError={failScene}
-            onReady={handleSceneReady}
-          />
-        ) : null}
+    <>
+      <div
+        ref={rootRef}
+        className={styles.experienceLayer}
+        data-experience-profile={profile}
+        data-input-mode={inputMode}
+        data-robot-stage="hero"
+        data-scene-status={sceneStatus}
+      >
+        <RobotStoryController hostRef={rootRef} onStageChange={handleStageChange} />
+        <div className={styles.robotViewport} aria-hidden="true">
+          <RobotFallback />
+          {profile === "full" && Scene ? (
+            <Scene
+              active={active}
+              onError={failScene}
+              onReady={handleSceneReady}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+      {/*
+        * A sibling of the layer, not a child: the layer sits at z-index 2 and the page copy
+        * at 3, so a button nested inside it can never be reached by a tap no matter how high
+        * its own z-index goes.
+        */}
+      {awaitingActivation && stage === "hero" ? (
+        <button type="button" className={styles.activateScene} onClick={activateScene}>
+          3D&apos;yi başlat
+        </button>
+      ) : null}
+    </>
   );
 }

@@ -44,8 +44,13 @@
   display: grid;
   align-content: start;
   padding-top: max(6rem, 11svh);
-  /* The lower half belongs to the robot; the copy stops before it. */
-  padding-bottom: 52svh;
+  /*
+   * The robot band is 52svh tall, but its mask leaves the top third of that band
+   * effectively transparent. Reserving the whole band pushed the hero past one screen
+   * for no visible gain, so the copy clears the robot's opaque core instead — which
+   * keeps the whole hero inside `min-height: 100svh` on every phone we measure.
+   */
+  padding-bottom: 34svh;
 }
 
 .heroCopy { display: grid; justify-items: start; }
@@ -79,39 +84,45 @@
   line-height: 1.55;
 }
 
-.heroActions { display: grid; gap: .6rem; width: 100%; margin-top: 1.5rem; }
+/*
+ * One full-width primary action on phones. The secondary action is demoted to a text
+ * link rather than squeezed alongside it — and never hidden, which is what the old
+ * short-viewport rule did to it.
+ */
+.heroActions { display: grid; justify-items: start; gap: .2rem; width: 100%; margin-top: 1.5rem; }
 
-.primaryCta,
-.secondaryCta {
+.primaryCta {
   min-height: 3.1rem;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: .7rem;
   padding: .8rem 1.3rem;
   border-radius: 999px;
+  background: var(--blue);
+  color: white;
   font-size: 1rem;
   font-weight: 680;
   transition: transform var(--motion-quick) var(--ease-expressive), background-color var(--motion-quick), color var(--motion-quick);
 }
 
-.primaryCta { background: var(--blue); color: white; }
 .primaryCta:hover { background: #174de8; }
-.secondaryCta { border: 1px solid #4b5264; color: #e9ecf4; }
-.secondaryCta:hover { background: white; color: var(--ink); }
 
+.secondaryCta,
 .budgetLink {
   min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  margin-top: .9rem;
-  color: #aeb5c6;
-  font-size: .95rem;
-  border-bottom: 1px solid #454b5c;
+  color: #c4c9d6;
+  font-size: 1rem;
+  font-weight: 650;
 }
 
-.budgetLink:hover { color: white; border-bottom-color: var(--blue); }
+.secondaryCta { margin-top: .6rem; border-bottom: 1px solid #5b6376; }
+.budgetLink { color: #aeb5c6; border-bottom: 1px solid #454b5c; }
+.secondaryCta:hover, .budgetLink:hover { color: white; border-bottom-color: var(--blue); }
 
 .trustStrip {
   display: flex;
@@ -132,7 +143,7 @@
 }
 
 .trustStrip::-webkit-scrollbar { display: none; }
-.trustStrip strong { color: white; font-size: .95rem; }
+.trustStrip strong { color: white; font-size: 1rem; }
 .trustStrip li { display: flex; align-items: baseline; gap: .35rem; }
 
 .pointerHint { display: none; }
@@ -140,16 +151,16 @@
 /* ------------------------------------------------------- 02 work showcase */
 
 .projects {
-  padding-block: clamp(4.5rem, 12vw, 9rem);
+  padding-block: clamp(3.75rem, 11vw, 9rem);
   background: rgb(7 8 12 / .94);
   color: white;
 }
 
 .projects .eyebrow, .final .eyebrow { color: #8aa7ff; }
 
-.projectsHeading { display: grid; gap: .9rem; margin-bottom: 2.5rem; }
+.projectsHeading { display: grid; gap: .9rem; margin-bottom: 1.9rem; }
 .projectsHeading .eyebrow { margin: 0; }
-.projectsHeading h2 { font-size: clamp(2.6rem, 10vw, 4rem); }
+.projectsHeading h2 { font-size: clamp(2.6rem, 9.5vw, 4rem); }
 
 .lightLink {
   min-height: 2.75rem;
@@ -214,7 +225,12 @@
 
 .projectLinks a:hover { border-bottom-color: var(--blue); }
 
-.showcaseGrid { display: grid; gap: 2rem; margin-top: 3rem; }
+/*
+ * The lead project above keeps the full-width treatment, so the supporting work reads as
+ * a contact sheet: two per row even on a phone. Stacking all four full-width cost more
+ * than a screen and a half of scrolling for images the visitor has already been sold on.
+ */
+.showcaseGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem .9rem; margin-top: 2rem; }
 
 .showcaseVisual {
   position: relative;
@@ -253,28 +269,28 @@
 
 .showcaseVisual:hover .showcaseArrow, .showcaseVisual:focus-visible .showcaseArrow { opacity: 1; transform: none; }
 
-.showcaseMeta { margin-top: .85rem; }
-.showcaseMeta h3 { font-size: 1.4rem; letter-spacing: -.02em; transition: transform var(--motion-quick) var(--ease-standard); }
+.showcaseMeta { margin-top: .6rem; }
+.showcaseMeta h3 { font-size: 1.15rem; letter-spacing: -.02em; transition: transform var(--motion-quick) var(--ease-standard); }
 .showcaseCard:hover .showcaseMeta h3 { transform: translateX(.3rem); }
-.showcaseMeta p { margin-top: .2rem; color: #a8adba; font-size: .92rem; }
+.showcaseMeta p { margin-top: .25rem; color: #a8adba; font-size: 1rem; }
 
 /* --------------------------------------------------------- shared heading */
 
-.sectionIntro { display: grid; gap: .6rem; margin-bottom: 2.5rem; }
+.sectionIntro { display: grid; gap: .6rem; margin-bottom: 1.9rem; }
 .sectionIntro .eyebrow { margin: 0; }
 .sectionIntro h2 { font-size: clamp(2.4rem, 9.5vw, 3.6rem); line-height: .98; letter-spacing: -.05em; }
 .sectionIntro > p:last-child { max-width: 42ch; color: var(--muted); }
 
 /* ------------------------------------------------------------ 03 services */
 
-.services { padding-block: clamp(4.5rem, 12vw, 9rem); background: #f7f7f3; color: var(--ink); }
+.services { padding-block: clamp(3.75rem, 11vw, 9rem); background: #f7f7f3; color: var(--ink); }
 .serviceGrid { display: grid; gap: 1px; background: var(--line); border-block: 1px solid var(--line); }
 
 .serviceCard {
   display: grid;
   align-content: start;
   gap: .55rem;
-  padding: 1.6rem 0 2rem;
+  padding: 1.35rem 0 1.6rem;
   background: #f7f7f3;
 }
 
@@ -297,7 +313,7 @@
 .serviceCard .textLink { justify-self: start; margin-top: .5rem; }
 
 /* A quiet orbit mark, kept from the previous service instruments. */
-.serviceInstrument { position: relative; width: 3.2rem; aspect-ratio: 1; margin-bottom: .3rem; }
+.serviceInstrument { position: relative; width: 2.4rem; aspect-ratio: 1; margin-bottom: .2rem; }
 .instrumentOrbit { position: absolute; inset: 0; border: 1px solid rgb(45 98 255 / .35); border-radius: 50%; }
 .instrumentOrbit::after { content: ""; position: absolute; inset: 32%; border-radius: 50%; background: rgb(45 98 255 / .12); }
 .instrumentOrbit i { position: absolute; width: .35rem; aspect-ratio: 1; border-radius: 50%; background: var(--blue); }
@@ -310,13 +326,13 @@
 
 /* ------------------------------------------------------------ 04 packages */
 
-.pricing { padding-block: clamp(4.5rem, 12vw, 9rem); background: #fff; color: var(--ink); }
+.pricing { padding-block: clamp(3.75rem, 11vw, 9rem); background: #fff; color: var(--ink); }
 
 .packageGrid {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(15.5rem, 78%);
-  gap: 1rem;
+  grid-auto-columns: minmax(15.5rem, 82%);
+  gap: .8rem;
   /* Full-bleed carousel on phones; the cards become a plain grid from tablet up. */
   width: 100vw;
   margin-left: calc(var(--pad) * -1);
@@ -333,7 +349,7 @@
   display: grid;
   align-content: start;
   gap: .5rem;
-  padding: 1.5rem 1.4rem 1.7rem;
+  padding: 1.25rem 1.15rem 1.4rem;
   border: 1px solid var(--line);
   background: var(--white);
   scroll-snap-align: center;
@@ -350,7 +366,7 @@
 .packageCardFeatured .packageAudience { color: #d3d6df; }
 
 .packageList { display: grid; gap: .45rem; margin-top: .6rem; list-style: none; }
-.packageList li { position: relative; padding-left: 1.4rem; font-size: .95rem; color: var(--muted); }
+.packageList li { position: relative; padding-left: 1.4rem; font-size: 1rem; color: var(--muted); }
 .packageList li::before { content: "↗"; position: absolute; left: 0; color: var(--blue); }
 .packageCardFeatured .packageList li { color: #d3d6df; }
 .packageCardFeatured .packageList li::before { color: #8aa7ff; }
@@ -372,16 +388,16 @@
 .quoteCard { padding: 1.3rem 1.4rem 1.5rem; border: 1px solid var(--line); }
 .quoteCard h3 { font-size: 1.5rem; letter-spacing: -.03em; }
 .quoteLabel { margin: .3rem 0 .5rem; color: var(--blue); font-weight: 700; }
-.quoteCard > p:last-child { color: var(--muted); font-size: .95rem; }
+.quoteCard > p:last-child { color: var(--muted); font-size: 1rem; }
 
 .pricingFoot { display: grid; gap: 1.2rem; margin-top: 2rem; }
 /* Small, but never grey-on-grey: this is the note that keeps the price honest. */
-.providerNote { max-width: 72ch; color: #4a4d56; font-size: .87rem; line-height: 1.5; }
+.providerNote { max-width: 72ch; color: #4a4d56; font-size: 1rem; line-height: 1.55; }
 .pricingFoot .button { justify-self: start; }
 
 /* ------------------------------------------------------------- 05 process */
 
-.process { padding-block: clamp(4.5rem, 12vw, 9rem); background: #f7f7f3; color: var(--ink); }
+.process { padding-block: clamp(3.75rem, 11vw, 9rem); background: #f7f7f3; color: var(--ink); }
 .processLine { position: relative; padding-top: 2px; }
 
 .processLine > span {
@@ -404,7 +420,7 @@
 
 /* ----------------------------------------------------------------- 06 faq */
 
-.faq { padding-block: clamp(4.5rem, 12vw, 9rem); background: #fff; color: var(--ink); }
+.faq { padding-block: clamp(3.75rem, 11vw, 9rem); background: #fff; color: var(--ink); }
 
 /* --------------------------------------------------------------- 07 final */
 
@@ -423,7 +439,7 @@
 
 .finalInner h2 {
   display: grid;
-  font-size: clamp(2.6rem, 10vw, 4rem);
+  font-size: clamp(2.6rem, 9.5vw, 4rem);
   line-height: .96;
   letter-spacing: -.05em;
 }
@@ -449,15 +465,31 @@
 }
 
 .finalCta:hover { background: #174de8; transform: translateY(-2px); }
-.finalAlt { color: #8d929f; font-size: .9rem; }
+.finalAlt { color: #9aa0ae; font-size: 1rem; }
 
 /* ====================================================== tablet and wider */
 
 @media (min-width: 48rem) {
-  .heroInner { padding-top: max(7rem, 13svh); padding-bottom: 46svh; }
+  .heroInner { padding-top: max(7rem, 13svh); padding-bottom: 38svh; }
   .heroTitle { font-size: clamp(2.8rem, 5.6vw, 5rem); line-height: .9; letter-spacing: -.06em; }
   .heroLead { max-width: 42ch; margin-top: 1.5rem; font-size: 1.1rem; }
-  .heroActions { display: flex; flex-wrap: wrap; gap: .75rem; width: auto; }
+
+  /* With room to breathe, the secondary action becomes a button beside the primary. */
+  .heroActions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; width: auto; }
+  .primaryCta { width: auto; }
+
+  .secondaryCta {
+    min-height: 3.1rem;
+    margin-top: 0;
+    padding: .8rem 1.3rem;
+    border: 1px solid #4b5264;
+    border-radius: 999px;
+    color: #e9ecf4;
+    font-weight: 680;
+  }
+
+  .secondaryCta:hover { background: white; border-color: white; color: var(--ink); }
+  .budgetLink { margin-top: 1.1rem; }
   .trustStrip { width: auto; margin-left: 0; padding-inline: 0; overflow: visible; gap: 2rem; }
 
   .projectsHeading { grid-template-columns: 1fr auto; align-items: end; }
@@ -465,10 +497,13 @@
   .projectsHeading h2 { grid-row: 2; }
   .lightLink { grid-row: 2; justify-self: end; }
   .heroProjectInfo { grid-template-columns: 1.4fr 1fr; gap: 2rem; align-items: start; }
-  .showcaseGrid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+  .showcaseGrid { gap: 2.5rem; margin-top: 3rem; }
+  .showcaseMeta { margin-top: .85rem; }
+  .showcaseMeta h3 { font-size: 1.4rem; }
 
   .serviceGrid { grid-template-columns: 1fr 1fr; gap: 1px; }
   .serviceCard { padding: 1.8rem; }
+  .serviceInstrument { width: 3.2rem; margin-bottom: .3rem; }
 
   .packageGrid {
     grid-auto-flow: row;
@@ -481,7 +516,7 @@
     gap: 0;
   }
 
-  .packageCard { border-right: 0; }
+  .packageCard { padding: 1.5rem 1.4rem 1.7rem; border-right: 0; }
   .packageCard:last-child { border-right: 1px solid var(--line); }
   .packageCardFeatured { border-right: 0; transform: translateY(-1rem); }
   .quoteGrid { grid-template-columns: 1fr 1fr; }
@@ -539,9 +574,34 @@
 }
 
 /*
- * The single height-based query in the sheet. On short landscape phones the hero's
- * reserved robot area would push the call to action off screen, so the split is
- * rebalanced instead of hiding any control.
+ * Short portrait phones (iPhone SE class). The hero copy block is the same height on
+ * every phone, but the robot band is a share of the viewport — so on a 667px screen the
+ * copy runs down over the robot's head. The rhythm tightens here and the robot takes a
+ * shorter band (experience.module.css) so the two keep to their own halves. Nothing is
+ * hidden: every line and control stays on the page.
+ */
+@media (max-height: 46rem) and (max-width: 47.99rem) {
+  .heroInner { padding-top: max(4.75rem, 8svh); padding-bottom: 30svh; }
+  .heroTitle { font-size: clamp(1.85rem, 7.4vw, 2.6rem); }
+  .heroLead { margin-top: .85rem; }
+  .heroActions { margin-top: 1.1rem; }
+  .secondaryCta { margin-top: .35rem; }
+  .trustStrip { margin-top: 1.05rem; }
+}
+
+/* The smallest screens we support (320x568). The robot keeps a token presence at the
+   foot of the hero rather than being half-buried under the copy. */
+@media (max-height: 36rem) and (max-width: 47.99rem) {
+  .heroInner { padding-top: max(3.5rem, 6svh); padding-bottom: 20svh; }
+  .heroTitle { font-size: clamp(1.6rem, 7.4vw, 2.6rem); }
+  .primaryCta { min-height: 2.9rem; }
+  .heroActions { margin-top: .9rem; }
+  .trustStrip { margin-top: .8rem; }
+}
+
+/*
+ * On short landscape phones the hero's reserved robot area would push the call to action
+ * off screen, so the split is rebalanced instead of hiding any control.
  */
 @media (max-height: 30rem) and (min-width: 48rem) {
   .hero, .final { min-height: auto; }

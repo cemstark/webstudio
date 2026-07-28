@@ -41,8 +41,13 @@
   position: fixed;
   inset: auto 0 0;
   width: 100%;
-  height: 52svh;
-  height: 52dvh;
+  /*
+   * The hero copy above is the same height on every phone, so a flat share of the
+   * viewport put the robot's head behind the last links on shorter screens. The band
+   * takes what the copy leaves instead, capped at the share it had before.
+   */
+  height: min(52svh, calc(100svh - 33.5rem));
+  height: min(52dvh, calc(100dvh - 33.5rem));
   overflow: hidden;
   isolation: isolate;
   opacity: 1;
@@ -179,6 +184,36 @@
   letter-spacing: .16em;
 }
 
+/*
+ * Opt-in control for the 3D scene on touch devices. It renders outside the experience
+ * layer, so it needs a z-index that clears the page copy (3) while staying under the
+ * mobile action bar (95) and the header (100).
+ */
+.activateScene {
+  position: fixed;
+  z-index: 94;
+  left: 50%;
+  bottom: max(3svh, calc(.75rem + env(safe-area-inset-bottom)));
+  min-height: 2.75rem;
+  padding: .6rem 1.1rem;
+  border: 1px solid #4b5264;
+  border-radius: 999px;
+  background: color-mix(in srgb, #07080c 78%, transparent);
+  backdrop-filter: blur(10px);
+  color: #e9ecf4;
+  font-size: .95rem;
+  font-weight: 650;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+
+.activateScene:hover { border-color: var(--blue); color: white; }
+
+@media (hover: hover) and (pointer: fine) {
+  .activateScene { display: none; }
+}
+
 /* Stage choreography. The robot yields the screen where the content has to be read. */
 [data-robot-stage="projects"] .robotViewport { opacity: 0; visibility: hidden; }
 [data-robot-stage="services"] .robotViewport { opacity: .16; height: 34svh; }
@@ -192,6 +227,31 @@
 
 /* Touch users scroll through the robot rather than orbiting it. */
 [data-input-mode="touch"] .splineMount { pointer-events: none; }
+
+/*
+ * Short portrait phones. The hero copy is the same height everywhere, so on a 667px
+ * screen a 52svh band puts the robot's head behind the last two links. A shorter band
+ * with a smaller figure keeps the robot fully in frame and fully out of the copy.
+ */
+@media (max-height: 46rem) and (max-width: 47.99rem) {
+  .robotViewport { height: 30svh; height: 30dvh; }
+  .fallbackFigure { width: min(32%, 10rem); }
+  .fallbackHalo { width: min(52%, 20rem); }
+  [data-robot-stage="services"] .robotViewport { height: 22svh; }
+  [data-robot-stage="process"] .robotViewport { height: 20svh; }
+  [data-robot-stage="final"] .robotViewport { height: 28svh; }
+}
+
+/* 320x568 class. Below this the copy and the robot cannot both have real room, so the
+   robot keeps a token presence and the copy keeps all of its space. */
+@media (max-height: 36rem) and (max-width: 47.99rem) {
+  .robotViewport { height: 20svh; height: 20dvh; }
+  .fallbackFigure { width: min(22%, 7rem); }
+  .fallbackHalo { width: min(38%, 14rem); }
+  [data-robot-stage="services"] .robotViewport { height: 16svh; }
+  [data-robot-stage="process"] .robotViewport { height: 15svh; }
+  [data-robot-stage="final"] .robotViewport { height: 19svh; }
+}
 
 @media (min-width: 64rem) {
   /* The robot gets its own column beside the copy instead of sitting behind it. */
