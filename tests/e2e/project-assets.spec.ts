@@ -83,6 +83,11 @@ for (const viewport of [
 }
 
 test("every changed project detail is responsive and exposes matching SEO metadata", async ({ browser }) => {
+  // Twelve full navigations, each one making a cold image optimizer encode a large source
+  // to AVIF at a width it has not produced before. That is minutes of real work on a
+  // two-core runner, and the suite's 90s default was cutting it off mid-assertion.
+  test.setTimeout(300_000);
+
   for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     const context = await browser.newContext({ viewport, reducedMotion: "reduce" });
     const page = await context.newPage();
