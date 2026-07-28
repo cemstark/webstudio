@@ -9,7 +9,7 @@
       "profile": "full",
       "sceneStatus": "ready",
       "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar",
-      "stageAfterScroll": "service-web",
+      "stageAfterScroll": "services",
       "contextLossSupported": true,
       "contextLossFallback": true
     },
@@ -22,7 +22,7 @@
       "profile": "full",
       "sceneStatus": "ready",
       "renderer": "Apple GPU",
-      "stageAfterScroll": "service-web",
+      "stageAfterScroll": "services",
       "contextLossSupported": true,
       "contextLossFallback": true
     }

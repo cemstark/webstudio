@@ -3,6 +3,7 @@ export type BaselineExperienceProfile = ExperienceProfile | "candidate";
 export type ExperienceInputMode = "touch" | "pointer";
 
 export const SPLINE_SESSION_FAILURE_KEY = "cemwebstudio:spline-failed";
+export const SPLINE_SESSION_ACTIVATION_KEY = "cemwebstudio:spline-activated";
 
 type NavigatorWithHints = Navigator & {
   connection?: { effectiveType?: string; saveData?: boolean };
@@ -42,6 +43,26 @@ export function rememberSceneFailure() {
   } catch {
     // Storage can be unavailable in strict privacy contexts. The in-memory
     // profile still falls back for the current page lifecycle.
+  }
+}
+
+/**
+ * A touch visitor asks for the scene once, not on every visit to the homepage. Without
+ * this the poster button would come back after any trip to an inner route.
+ */
+export function rememberSceneActivation() {
+  try {
+    window.sessionStorage.setItem(SPLINE_SESSION_ACTIVATION_KEY, "1");
+  } catch {
+    // Same as above: the choice simply does not survive the navigation.
+  }
+}
+
+export function sceneActivatedThisSession() {
+  try {
+    return window.sessionStorage.getItem(SPLINE_SESSION_ACTIVATION_KEY) === "1";
+  } catch {
+    return false;
   }
 }
 

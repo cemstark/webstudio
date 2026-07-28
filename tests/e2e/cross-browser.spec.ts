@@ -19,7 +19,9 @@ test("home fallback and core content work without Spline", async ({ page }) => {
   const firstProject = page.locator("#secili-projeler article").first();
   await expect(firstProject).toContainText("Vela Windsurfing");
   await expect(firstProject.locator('a[href="https://velawindsurfing.com"]')).toBeVisible();
-  await expect(page.getByText("TL 35.000", { exact: true })).toBeVisible();
+  // The commerce packages sit behind their own tab once the switcher hydrates.
+  await page.getByRole("tab", { name: "E-ticaret" }).click();
+  await expect(page.getByRole("tabpanel").getByText("TL 35.000", { exact: true })).toBeVisible();
   expect(requests.filter(isSplineAsset)).toEqual([]);
   expect(errors).toEqual([]);
 });

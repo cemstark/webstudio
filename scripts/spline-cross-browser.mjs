@@ -46,10 +46,12 @@ async function inspectEngine(name, browserType) {
     });
     await mkdir(outputDirectory, { recursive: true });
     await page.screenshot({ path: `${outputDirectory}/${name}-hero.png` });
-    await page.locator('[data-robot-stage="service-web"]:not([data-experience-profile])').scrollIntoViewIfNeeded();
+    // "services" is one of the stages where the robot stays on screen, so the scene has to
+    // still be rendering after the scroll rather than having been torn down.
+    await page.locator('[data-robot-stage="services"]:not([data-experience-profile])').scrollIntoViewIfNeeded();
     await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     evidence.stageAfterScroll = await page.locator("[data-experience-profile]").getAttribute("data-robot-stage");
-    evidence.status = evidence.canvasCount === 1 && evidence.stageAfterScroll === "service-web" ? "rendered" : "invalid";
+    evidence.status = evidence.canvasCount === 1 && evidence.stageAfterScroll === "services" ? "rendered" : "invalid";
 
     evidence.contextLossSupported = await canvas.evaluate((element) => {
       const gl = element.getContext("webgl2") ?? element.getContext("webgl");

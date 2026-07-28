@@ -20,7 +20,7 @@ const activeSceneStages = new Set<RobotStage>(["hero", "services", "final"]);
 
 export function ExperienceShell() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { activateScene, awaitingActivation, disableExperience, inputMode, profile } = useExperienceProfile();
+  const { activateScene, awaitingActivation, disableExperience, inputMode, profile, ready } = useExperienceProfile();
   const [Scene, setScene] = useState<ComponentType<RobotSceneProps> | null>(null);
   const [sceneStatus, setSceneStatus] = useState<"poster" | "loading" | "ready" | "failed">("poster");
   const [stage, setStage] = useState<RobotStage>("hero");
@@ -79,6 +79,7 @@ export function ExperienceShell() {
         ref={rootRef}
         className={styles.experienceLayer}
         data-experience-profile={profile}
+        data-experience-ready={ready}
         data-input-mode={inputMode}
         data-robot-stage="hero"
         data-scene-status={sceneStatus}

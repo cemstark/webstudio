@@ -56,13 +56,29 @@ async function createMockedMobile(
   return context;
 }
 
+/**
+ * Touch visitors get a poster and an explicit invitation instead of an automatic WebGL
+ * download, so a touch test has to accept that invitation before anything loads. The
+ * button is absent once the choice is remembered for the session, or on pointer devices.
+ */
+async function acceptSceneOffer(page: Page) {
+  // The offer only exists after the capability check has run, so waiting for that flag is
+  // what separates "no offer" from "not decided yet" — checking too early skips the click
+  // and leaves the profile at its initial "none".
+  await expect(page.locator("[data-experience-ready='true']")).toHaveCount(1);
+  const offer = page.getByRole("button", { name: "3D'yi başlat" });
+  if (await offer.count()) await offer.click();
+}
+
 async function expectFullScene(page: Page) {
+  await acceptSceneOffer(page);
   await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "full");
   await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "ready");
   await expect(page.locator("[data-spline-scene] canvas")).toHaveCount(1);
 }
 
 async function expectNoSpline(page: Page, requests: string[], profile: "lite" | "none") {
+  await acceptSceneOffer(page);
   await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", profile);
   await page.waitForTimeout(2_200);
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -147,6 +163,7 @@ test("orientation during scene loading does not duplicate the request or canvas"
   });
   const page = await context.newPage();
   await page.goto("/");
+  await acceptSceneOffer(page);
   await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "loading");
   await page.setViewportSize({ width: 844, height: 390 });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -163,20 +180,51 @@ test("ten client-side home-inner route cycles keep one canvas and stable listene
   });
   await context.addInitScript(() => {
     const monitoredEvents = new Set(["pointermove", "resize", "scroll", "visibilitychange"]);
-    const counts: Record<string, number> = {};
+    /*
+     * Registrations, not calls.
+     *
+     * The DOM ignores a repeated addEventListener for the same target, type, listener and
+     * capture flag, and ScrollTrigger re-registers one shared `_onResize` for every trigger
+     * it creates — its `disable()` only unregisters when the scroller is not the viewport.
+     * Counting calls therefore reports steady growth while the browser's live listener set
+     * never moves (verified against CDP's own listener inventory). What this test is for is
+     * the opposite case: a component that adds a fresh closure on every mount and drops it,
+     * which still shows up here because each closure is a distinct set member.
+     */
+    const live = new Map<string, Set<unknown>>();
     const nativeAdd = EventTarget.prototype.addEventListener;
     const nativeRemove = EventTarget.prototype.removeEventListener;
-    Object.defineProperty(window, "__CEM_LISTENER_COUNTS__", { configurable: true, value: counts });
+    const keyOf = (target: EventTarget, type: string, options?: boolean | AddEventListenerOptions) => {
+      const capture = typeof options === "boolean" ? options : Boolean(options?.capture);
+      return `${target === window ? "window" : "document"}:${type}:${capture}`;
+    };
+    const tracked = (target: EventTarget, type: string, listener: unknown) => (
+      (target === window || target === document) && Boolean(listener) && monitoredEvents.has(type)
+    );
+
+    Object.defineProperty(window, "__CEM_LISTENER_COUNTS__", {
+      configurable: true,
+      get: () => {
+        const counts: Record<string, number> = {};
+        for (const [key, listeners] of live) {
+          const type = key.split(":")[1];
+          if (listeners.size) counts[type] = (counts[type] ?? 0) + listeners.size;
+        }
+        return counts;
+      },
+    });
+
     EventTarget.prototype.addEventListener = function (type, listener, options) {
-      if ((this === window || this === document) && listener && monitoredEvents.has(type)) {
-        counts[type] = (counts[type] ?? 0) + 1;
+      if (tracked(this, type, listener)) {
+        const key = keyOf(this, type, options);
+        const bucket = live.get(key) ?? new Set<unknown>();
+        bucket.add(listener);
+        live.set(key, bucket);
       }
       return nativeAdd.call(this, type, listener, options);
     };
     EventTarget.prototype.removeEventListener = function (type, listener, options) {
-      if ((this === window || this === document) && listener && monitoredEvents.has(type)) {
-        counts[type] = Math.max(0, (counts[type] ?? 0) - 1);
-      }
+      if (tracked(this, type, listener)) live.get(keyOf(this, type, options))?.delete(listener);
       return nativeRemove.call(this, type, listener, options);
     };
   });
@@ -230,6 +278,7 @@ test("slow scene response keeps the first-paint fallback visible until ready", a
   });
   const page = await context.newPage();
   await page.goto("/");
+  await acceptSceneOffer(page);
   await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "loading");
   await expect(page.locator("[data-robot-fallback]")).toBeVisible();
   await expect(page.locator("[data-robot-fallback]")).toHaveCSS("opacity", "1");
@@ -297,6 +346,7 @@ for (const failure of [
     });
     const page = await context.newPage();
     await page.goto("/");
+    await acceptSceneOffer(page);
     await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-experience-profile", "none");
     await expect(page.locator("[data-robot-fallback]")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -341,6 +391,7 @@ test("leaving home while the scene is loading cleans up the canvas", async ({ br
   });
   const page = await context.newPage();
   await page.goto("/");
+  await acceptSceneOffer(page);
   await expect(page.locator("[data-scene-status]")).toHaveAttribute("data-scene-status", "loading");
   await page.goto("/projeler");
   await expect(page.locator("h1")).toBeVisible();
@@ -398,8 +449,18 @@ test("Vela remains first and all fixed prices remain correct", async ({ page }) 
   const firstProject = page.locator("#secili-projeler article").first();
   await expect(firstProject).toContainText("Vela Windsurfing");
   await expect(firstProject.locator('a[href="https://velawindsurfing.com"]')).toBeVisible();
-  for (const price of ["TL 7.000", "TL 15.000", "TL 30.000", "TL 25.000", "TL 35.000"]) {
-    await expect(page.getByText(price, { exact: true }).first()).toBeVisible();
+
+  // The two package groups share one tab strip, so each set is read behind its own tab.
+  // TL 15.000 appears in both groups, which is why it is checked on each side.
+  for (const [tab, prices] of [
+    ["Web Sitesi & Blog", ["TL 7.000", "TL 15.000", "TL 30.000"]],
+    ["E-ticaret", ["TL 15.000", "TL 25.000", "TL 35.000"]],
+  ] as const) {
+    await page.getByRole("tab", { name: tab }).click();
+    await expect(page.getByRole("tab", { name: tab })).toHaveAttribute("aria-selected", "true");
+    for (const price of prices) {
+      await expect(page.getByRole("tabpanel").getByText(price, { exact: true })).toBeVisible();
+    }
   }
 });
 
@@ -416,6 +477,31 @@ test("JavaScript disabled preserves the core story, prices, Vela and CTA", async
   await expect(page.locator("[data-robot-fallback]")).toBeVisible();
   await expect(page.locator("canvas")).toHaveCount(0);
   await context.close();
+});
+
+test("package tabs are reachable and switchable from the keyboard alone", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const web = page.getByRole("tab", { name: "Web Sitesi & Blog" });
+  const commerce = page.getByRole("tab", { name: "E-ticaret" });
+
+  // Roving tabindex puts only the active tab in the Tab order, so arrow keys are the only
+  // way to the second group. Without them its prices are unreachable without a mouse.
+  await web.focus();
+  await expect(web).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(commerce).toBeFocused();
+  await expect(commerce).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel").getByText("TL 35.000", { exact: true })).toBeVisible();
+
+  await page.keyboard.press("ArrowLeft");
+  await expect(web).toBeFocused();
+  await expect(page.getByRole("tabpanel").getByText("TL 7.000", { exact: true })).toBeVisible();
+
+  await page.keyboard.press("End");
+  await expect(commerce).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(web).toBeFocused();
 });
 
 test("FAQ summaries toggle from the keyboard", async ({ browser }) => {

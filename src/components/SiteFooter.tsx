@@ -3,7 +3,7 @@ import { navigation, site } from "@/content/site";
 
 export function SiteFooter() {
   return (
-    <footer className="siteFooter">
+    <footer className="siteFooter" data-header-theme="dark">
       <div className="container footerGrid">
         <div>
           <Link className="brand footerBrand" href="/">cem<span>webstudio</span></Link>

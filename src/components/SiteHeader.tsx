@@ -13,21 +13,28 @@ const menuLinks = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [homeTheme, setHomeTheme] = useState<"light" | "dark">("dark");
+  /*
+   * Keyed by route so a navigation falls straight back to that route's opening theme
+   * instead of carrying the previous page's last section across — deriving it here
+   * rather than resetting from an effect keeps the very first paint correct.
+   */
+  const [observed, setObserved] = useState<{ path: string; theme: "light" | "dark" } | null>(null);
   const pathname = usePathname();
   const openerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const theme = pathname === "/" ? homeTheme : "light";
+  // Home opens on the dark hero; every other route opens on the light page hero.
+  const theme = observed?.path === pathname ? observed.theme : pathname === "/" ? "dark" : "light";
 
   useEffect(() => {
-    if (pathname !== "/") return;
+    // Runs on every route: inner pages close on a dark call to action and a dark footer,
+    // where a header locked to the light theme left the brand unreadable.
     const sections = document.querySelectorAll<HTMLElement>("[data-header-theme]");
     const observer = new IntersectionObserver((entries) => {
       const visible = entries
         .filter((entry) => entry.isIntersecting)
         .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       const next = visible?.target.getAttribute("data-header-theme");
-      if (next === "light" || next === "dark") setHomeTheme(next);
+      if (next === "light" || next === "dark") setObserved({ path: pathname, theme: next });
     }, { rootMargin: "-12% 0px -76%", threshold: [0, 0.2, 0.8] });
 
     sections.forEach((section) => observer.observe(section));

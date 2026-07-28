@@ -59,9 +59,10 @@ for (const viewport of [
           await expect(page.getByRole("link", { name: new RegExp(project.name, "i") }).first()).toBeVisible();
         }
       } else {
+        // The lead project plus the four supporting cards: every featured row has real art.
         const featuredImages = page.locator("#secili-projeler img");
         await featuredImages.first().scrollIntoViewIfNeeded();
-        await expect(featuredImages).toHaveCount(3);
+        await expect(featuredImages).toHaveCount(5);
       }
       await page.screenshot({
         fullPage: true,

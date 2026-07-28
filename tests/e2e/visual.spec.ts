@@ -28,14 +28,11 @@ const selectedMobileViewports = viewportFilter.size
   ? mobileViewports.filter((viewport) => viewportFilter.has(viewport.name))
   : mobileViewports;
 
+/** The homepage's stages after the rewrite: one section each, no per-service scenes. */
 const stages = [
-  ["manifesto", "manifesto"],
-  ["service-web", "service-01-web-tasarim"],
-  ["service-seo", "service-02-seo"],
-  ["service-mobile", "service-03-mobil-uygulama"],
-  ["service-commerce", "service-04-e-ticaret"],
-  ["projects", "vela-proje-portali"],
-  ["pricing", "fiyatlandirma"],
+  ["projects", "secili-projeler"],
+  ["services", "hizmetler"],
+  ["pricing", "paketler"],
   ["process", "surec"],
   ["faq", "sss"],
   ["final", "final-cta"],
@@ -59,12 +56,13 @@ async function positionStage(page: Page, stage: string, block: "start" | "center
   await expect(page.locator("[data-experience-profile]")).toHaveAttribute("data-robot-stage", stage);
   const splineScene = page.locator("[data-spline-scene]");
   if (await splineScene.count()) {
-    const activeStages = new Set(["hero", "service-web", "service-seo", "service-mobile", "service-commerce", "final"]);
+    // The stages where the robot is still on screen; elsewhere the scene stops rendering.
+    const activeStages = new Set(["hero", "services", "final"]);
     await expect(splineScene).toHaveAttribute("data-spline-active", activeStages.has(stage) ? "true" : "false");
   }
 }
 
-async function captureStory(page: Page, directory: string, includeServiceMids = true) {
+async function captureStory(page: Page, directory: string, includeMidFrames = true) {
   await page.evaluate(() => { document.documentElement.style.scrollBehavior = "auto"; });
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -72,7 +70,8 @@ async function captureStory(page: Page, directory: string, includeServiceMids = 
   for (const [stage, filename] of stages) {
     await positionStage(page, stage, "start");
     await captureViewport(page, `${directory}/${filename}-start.png`);
-    if (includeServiceMids && stage.startsWith("service-")) {
+    // The sections the robot shares with the copy are also worth a mid-scroll frame.
+    if (includeMidFrames && (stage === "services" || stage === "process")) {
       await positionStage(page, stage, "center");
       await captureViewport(page, `${directory}/${filename}-mid.png`);
     }
@@ -141,7 +140,7 @@ async function captureFallbackMode(context: BrowserContext, mode: string, viewpo
   await expect(page.locator("[data-robot-fallback]")).toBeVisible();
   const directory = `${outputRoot}/${mode}/${viewport.name}`;
   await captureViewport(page, `${directory}/hero.png`);
-  for (const [stage, filename] of [["service-web", "service-01-web-tasarim"], ["final", "final-cta"]] as const) {
+  for (const [stage, filename] of [["services", "hizmetler"], ["final", "final-cta"]] as const) {
     await positionStage(page, stage, stage === "final" ? "start" : "center");
     await captureViewport(page, `${directory}/${filename}.png`);
   }

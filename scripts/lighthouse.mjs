@@ -8,11 +8,20 @@ const baseUrl = `http://127.0.0.1:${port}`;
 const outputDirectory = process.env.LIGHTHOUSE_OUTPUT_DIRECTORY ?? "qa/lighthouse/step-3/final";
 const runsPerProfile = Number(process.env.LIGHTHOUSE_RUNS ?? 3);
 const cacheModes = (process.env.LIGHTHOUSE_CACHE_MODES ?? "cold,warm").split(",").filter(Boolean);
+/*
+ * `full` says whether the scene is expected to load during the run.
+ *
+ * A capable phone now arrives at a poster and is offered the scene rather than being given
+ * it, so the mobile profile measures the page as a phone actually receives it: no WebGL
+ * download unless the visitor asks. Desktop still loads it on idle, and keeps the budget.
+ * `mobile` mirrors Lighthouse's own touch emulation onto the structural-evidence page, so
+ * both halves of the run look at the same device.
+ */
 const pages = [
-  { name: "home-mobile-full", path: "/?qa-experience=full", full: true },
-  { name: "home-mobile-lite", path: "/?qa-experience=lite" },
+  { name: "home-mobile-poster", path: "/?qa-experience=full", full: false, mobile: true, expectOffer: true },
+  { name: "home-mobile-lite", path: "/?qa-experience=lite", mobile: true },
   { name: "home-desktop-full", path: "/?qa-experience=full", preset: "desktop", full: true },
-  { name: "pricing-mobile", path: "/fiyatlandirma" },
+  { name: "pricing-mobile", path: "/fiyatlandirma", mobile: true },
 ];
 const profileFilter = new Set((process.env.LIGHTHOUSE_PROFILES ?? "").split(",").filter(Boolean));
 const selectedPages = profileFilter.size ? pages.filter((page) => profileFilter.has(page.name)) : pages;
@@ -132,8 +141,17 @@ async function waitForSceneState(page, definition) {
   }
 }
 
+/** Puts a CDP-driven page on the same device Lighthouse emulates for this profile. */
+async function applyDeviceEmulation(context, page, definition) {
+  if (!definition.mobile) return;
+  const client = await context.newCDPSession(page);
+  await client.send("Emulation.setDeviceMetricsOverride", { width: 412, height: 823, deviceScaleFactor: 1.75, mobile: true });
+  await client.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+}
+
 async function warmCache(context, definition) {
   const page = await context.newPage();
+  await applyDeviceEmulation(context, page, definition);
   await page.goto(`${baseUrl}${definition.path}`, { waitUntil: "domcontentloaded" });
   await waitForSceneState(page, definition);
   await page.close();
@@ -141,6 +159,7 @@ async function warmCache(context, definition) {
 
 async function collectStructuralEvidence(context, definition, cacheMode, run) {
   const page = await context.newPage();
+  await applyDeviceEmulation(context, page, definition);
   const sceneRequests = [];
   page.on("request", (request) => {
     if (request.url().includes("scene.splinecode")) sceneRequests.push(request.url());
@@ -177,6 +196,7 @@ async function collectStructuralEvidence(context, definition, cacheMode, run) {
         .filter((entry) => entry.name.startsWith("cem:"))
         .map((entry) => ({ name: entry.name, startTime: entry.startTime })),
       profile: document.querySelector("[data-experience-profile]")?.getAttribute("data-experience-profile") ?? null,
+      sceneOffered: [...document.querySelectorAll("button")].some((button) => button.textContent?.includes("3D")),
       sceneStatus: document.querySelector("[data-scene-status]")?.getAttribute("data-scene-status") ?? null,
       splineOpacity: document.querySelector("[data-spline-scene]")
         ? getComputedStyle(document.querySelector("[data-spline-scene]")).opacity
@@ -201,6 +221,10 @@ async function collectStructuralEvidence(context, definition, cacheMode, run) {
   const expectedCanvases = definition.full ? 1 : 0;
   if (evidence.sceneRequests !== expectedSceneRequests || evidence.canvasCount !== expectedCanvases) {
     throw new Error(`${definition.name} ${cacheMode} run ${run} structural assertion failed: ${evidence.sceneRequests} scene requests, ${evidence.canvasCount} canvases.`);
+  }
+  // Zero scene requests has to mean "offered and declined", not "the layer never rendered".
+  if (definition.expectOffer && !evidence.sceneOffered) {
+    throw new Error(`${definition.name} ${cacheMode} run ${run} rendered no scene offer, so the empty scene budget is not the poster.`);
   }
   await page.close();
   return evidence;

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function FinalCta({ title = "Bir sonraki dijital ürününüzü birlikte netleştirelim." }: { title?: string }) {
   return (
-    <section className="finalCta section">
+    <section className="finalCta section" data-header-theme="dark">
       <div className="container finalCtaInner">
         <p className="eyebrow">YENİ PROJE</p>
         {/* The one scroll-triggered heading per route, matching the homepage's close. */}

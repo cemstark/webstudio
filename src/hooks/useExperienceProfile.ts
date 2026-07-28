@@ -5,7 +5,9 @@ import {
   detectBaselineExperienceProfile,
   detectExperienceInputMode,
   detectExperienceProfile,
+  rememberSceneActivation,
   rememberSceneFailure,
+  sceneActivatedThisSession,
   type ExperienceInputMode,
   type ExperienceProfile,
 } from "@/lib/webgl";
@@ -16,6 +18,12 @@ export function useExperienceProfile() {
   const [inputMode, setInputMode] = useState<ExperienceInputMode>("touch");
   /** True when the scene could run but is waiting for the visitor to ask for it. */
   const [awaitingActivation, setAwaitingActivation] = useState(false);
+  /**
+   * True once the capability check has run. Until then `profile` and `awaitingActivation`
+   * are still their initial values, so nothing downstream can tell "no scene offered"
+   * apart from "not decided yet".
+   */
+  const [ready, setReady] = useState(false);
   const activateRef = useRef<() => void>(() => {});
 
   const disableExperience = useCallback(() => {
@@ -43,11 +51,15 @@ export function useExperienceProfile() {
       // On touch devices the robot stays a poster until it is asked for: a phone should not
       // spend its battery and data on a WebGL scene the visitor never requested. Reading the
       // input mode here keeps the offer in sync when the baseline changes later on.
-      if (!activationStarted && detectExperienceInputMode() === "touch") setAwaitingActivation(true);
+      if (activationStarted || detectExperienceInputMode() !== "touch") return;
+      // Asking once is enough — a visitor who already said yes this session gets the scene.
+      if (sceneActivatedThisSession()) activate();
+      else setAwaitingActivation(true);
     };
     const activate = () => {
       if (activationStarted || detectBaselineExperienceProfile() !== "candidate") return;
       activationStarted = true;
+      if (detectExperienceInputMode() === "touch") rememberSceneActivation();
       setAwaitingActivation(false);
       const nextProfile = detectExperienceProfile();
       window.performance.mark(`cem:experience-profile-${nextProfile}`);
@@ -57,7 +69,12 @@ export function useExperienceProfile() {
       if (!activationStarted) window.performance.mark("cem:experience-intent");
       activate();
     };
-    const updateInputMode = () => setInputMode(detectExperienceInputMode());
+    // Called unconditionally below, so it also marks the whole decision as settled. React
+    // batches it with whatever updateBaseline just set, so both land in one render.
+    const updateInputMode = () => {
+      setInputMode(detectExperienceInputMode());
+      setReady(true);
+    };
     const intentEvents = ["pointerdown", "touchstart", "wheel"] as const;
 
     activateRef.current = activate;
@@ -94,5 +111,5 @@ export function useExperienceProfile() {
     };
   }, []);
 
-  return { activateScene, awaitingActivation, disableExperience, inputMode, profile } as const;
+  return { activateScene, awaitingActivation, disableExperience, inputMode, profile, ready } as const;
 }
