@@ -1,0 +1,38 @@
+.switcher { display: grid; gap: 1.5rem; }
+
+.tabs {
+  display: inline-flex;
+  gap: .25rem;
+  justify-self: start;
+  padding: .25rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.tab {
+  min-height: 2.9rem;
+  padding: .55rem 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: .92rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color var(--motion-quick) var(--ease-standard), color var(--motion-quick) var(--ease-standard);
+}
+
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--white); }
+
+/* Without the tab strip each group needs its own visible heading to stay navigable. */
+.panelHeading { font-size: 1.15rem; letter-spacing: -.01em; }
+.switcher[data-enhanced="true"] .panelHeading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.panel { display: grid; gap: 1.25rem; }
+.panel[hidden] { display: none; }
+
+@media (min-width: 48rem) {
+  .switcher { gap: 2rem; }
+}

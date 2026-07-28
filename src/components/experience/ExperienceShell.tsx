@@ -15,14 +15,8 @@ type RobotSceneProps = {
   onReady: () => void;
 };
 
-const activeSceneStages = new Set<RobotStage>([
-  "hero",
-  "service-web",
-  "service-seo",
-  "service-mobile",
-  "service-commerce",
-  "final",
-]);
+/** Stages where the robot is actually on screen; elsewhere the scene stops rendering. */
+const activeSceneStages = new Set<RobotStage>(["hero", "services", "final"]);
 
 export function ExperienceShell() {
   const rootRef = useRef<HTMLDivElement>(null);

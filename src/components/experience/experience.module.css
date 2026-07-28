@@ -1,3 +1,12 @@
+/*
+ * Robot experience layer — mobile-first.
+ *
+ * The viewport never extends past the screen edge. The previous sheet pushed it to
+ * 124vw wide and 31vw off-screen to make the robot look bigger, which cropped it and
+ * forced dark overlays on top of the copy so the text stayed readable. Here the robot
+ * simply occupies the lower band of the hero, in frame, with the copy above it.
+ */
+
 .experienceLayer {
   --robot-stage-progress: 0;
   position: fixed;
@@ -30,17 +39,17 @@
 
 .robotViewport {
   position: fixed;
-  top: 0;
-  right: -2vw;
-  width: min(76vw, 72rem);
-  height: 100svh;
+  inset: auto 0 0;
+  width: 100%;
+  height: 52svh;
+  height: 52dvh;
   overflow: hidden;
   isolation: isolate;
   opacity: 1;
-  transform: translate3d(2vw, calc((var(--robot-stage-progress) - .5) * -1.5rem), 0) scale(.82);
-  transform-origin: 56% 55%;
-  mask-image: radial-gradient(ellipse 72% 76% at 57% 52%, #000 45%, transparent 100%);
-  transition: transform .85s var(--ease-expressive), opacity .5s ease;
+  transform: translate3d(0, calc((var(--robot-stage-progress) - .5) * -1rem), 0);
+  transform-origin: 50% 70%;
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 62%, #000 52%, transparent 100%);
+  transition: opacity .5s ease, transform .85s var(--ease-expressive);
 }
 
 .splineMount,
@@ -71,7 +80,7 @@
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 58% 42%, rgb(83 122 255 / .2), transparent 24%),
+    radial-gradient(circle at 50% 42%, rgb(83 122 255 / .2), transparent 30%),
     linear-gradient(135deg, transparent 42%, rgb(45 98 255 / .08) 42.2%, transparent 42.6%);
   opacity: 1;
   transition: opacity .45s ease;
@@ -79,7 +88,7 @@
 
 .fallbackHalo {
   position: absolute;
-  width: min(70%, 42rem);
+  width: min(62%, 26rem);
   aspect-ratio: 1;
   border: 1px solid rgb(121 150 255 / .35);
   border-radius: 50%;
@@ -90,16 +99,16 @@
   position: absolute;
   inset: 13% 5%;
   background-image: linear-gradient(rgb(117 136 190 / .09) 1px, transparent 1px), linear-gradient(90deg, rgb(117 136 190 / .09) 1px, transparent 1px);
-  background-size: 3.2rem 3.2rem;
+  background-size: 2.6rem 2.6rem;
   mask-image: radial-gradient(circle, #000, transparent 70%);
 }
 
 .fallbackFigure {
   position: relative;
-  width: min(50%, 27rem);
+  width: min(42%, 15rem);
   aspect-ratio: .63;
   filter: drop-shadow(0 2rem 3rem rgb(0 0 0 / .7));
-  transform: translateY(8%);
+  transform: translateY(4%);
 }
 
 .fallbackHead,
@@ -170,64 +179,36 @@
   letter-spacing: .16em;
 }
 
-[data-robot-stage^="service-"] .robotViewport { transform: translate3d(3vw, calc((var(--robot-stage-progress) - .5) * -2.5rem), 0) scale(.88); }
-[data-robot-stage="manifesto"] .robotViewport { opacity: .13; transform: translate3d(32vw, 6vh, 0) scale(.58); }
-[data-robot-stage="manifesto"] .splineMount { pointer-events: none; }
-[data-robot-stage="projects"] .robotViewport { opacity: .42; transform: translate3d(-42vw, 5vh, 0) scale(.66); }
-[data-robot-stage="projects"] .splineMount { pointer-events: none; }
-[data-robot-stage="pricing"] .robotViewport { opacity: .09; transform: translate3d(18vw, 8vh, 0) scale(.52); }
-[data-robot-stage="pricing"] .splineMount { pointer-events: none; }
-[data-robot-stage="process"] .robotViewport { opacity: .16; transform: translate3d(18vw, 4vh, 0) scale(.64); }
-[data-robot-stage="process"] .splineMount { pointer-events: none; }
-[data-robot-stage="faq"] .robotViewport { opacity: 0; transform: translate3d(20vw, 0, 0) scale(.55); }
-[data-robot-stage="faq"] .splineMount { pointer-events: none; }
-[data-robot-stage="final"] .robotViewport { opacity: 1; transform: translate3d(2vw, 2vh, 0) scale(.94); }
+/* Stage choreography. The robot yields the screen where the content has to be read. */
+[data-robot-stage="projects"] .robotViewport { opacity: 0; visibility: hidden; }
+[data-robot-stage="services"] .robotViewport { opacity: .16; height: 34svh; }
+[data-robot-stage="pricing"] .robotViewport { opacity: 0; visibility: hidden; }
+[data-robot-stage="process"] .robotViewport { opacity: .12; height: 30svh; }
+[data-robot-stage="faq"] .robotViewport { opacity: 0; visibility: hidden; }
+[data-robot-stage="final"] .robotViewport { opacity: 1; height: 48svh; }
 
-@media (max-width: 960px) {
+[data-robot-stage="services"] .splineMount,
+[data-robot-stage="process"] .splineMount { pointer-events: none; }
+
+/* Touch users scroll through the robot rather than orbiting it. */
+[data-input-mode="touch"] .splineMount { pointer-events: none; }
+
+@media (min-width: 64rem) {
+  /* The robot gets its own column beside the copy instead of sitting behind it. */
   .robotViewport {
-    top: auto;
-    right: -18vw;
-    bottom: 0;
-    width: 108vw;
-    height: 60svh;
-    height: 60dvh;
-    transform: none;
-    transform-origin: 68% 72%;
-    mask-image: radial-gradient(ellipse 64% 62% at 68% 68%, #000 45%, transparent 100%);
+    inset: 0 0 auto auto;
+    width: min(52vw, 60rem);
+    height: 100svh;
+    transform: translate3d(0, calc((var(--robot-stage-progress) - .5) * -1.5rem), 0) scale(.92);
+    transform-origin: 52% 55%;
+    mask-image: radial-gradient(ellipse 74% 78% at 54% 52%, #000 48%, transparent 100%);
   }
 
-  [data-input-mode="touch"] .splineMount { pointer-events: none; }
-  .fallbackFigure { width: min(47%, 20rem); }
-  [data-robot-stage="manifesto"] .robotViewport { right: -35vw; bottom: 9svh; width: 72vw; height: 34svh; opacity: .11; transform: scale(.72); }
-  [data-robot-stage^="service-"] .robotViewport { right: -35vw; bottom: 1svh; width: 76vw; height: 38svh; opacity: .18; transform: scale(.78); }
-  [data-robot-stage="projects"] .robotViewport { right: -40vw; bottom: 3svh; width: 70vw; height: 34svh; opacity: .08; transform: scale(.72); }
-  [data-robot-stage="pricing"] .robotViewport { right: -38vw; bottom: 5svh; width: 66vw; height: 31svh; opacity: .06; transform: scale(.68); }
-  [data-robot-stage="process"] .robotViewport { right: -34vw; bottom: 5svh; width: 68vw; height: 34svh; opacity: .12; transform: scale(.72); }
-  [data-robot-stage="faq"] .robotViewport { opacity: 0; visibility: hidden; }
-  [data-robot-stage="final"] .robotViewport { right: -28vw; bottom: max(1svh, env(safe-area-inset-bottom)); width: 96vw; height: 57svh; opacity: .78; transform: none; }
-  [data-robot-stage="manifesto"] .robotFallback,
-  [data-robot-stage^="service-"] .robotFallback,
-  [data-robot-stage="projects"] .robotFallback,
-  [data-robot-stage="pricing"] .robotFallback,
-  [data-robot-stage="process"] .robotFallback { background: transparent; }
-}
-
-@media (max-width: 520px) {
-  .robotViewport { right: -31vw; width: 124vw; height: 55svh; height: 55dvh; }
-  .fallbackFigure { width: min(44%, 16rem); }
-  .fallbackGrid { background-size: 2.3rem 2.3rem; }
-  [data-robot-stage="final"] .robotViewport { right: -48vw; bottom: max(-9svh, calc(env(safe-area-inset-bottom) - 9svh)); width: 112vw; height: 52svh; height: 52dvh; }
-}
-
-@media (max-height: 620px) and (max-width: 640px) {
-  .robotViewport { right: -34vw; width: 116vw; height: 46svh; height: 46dvh; }
-  [data-robot-stage="final"] .robotViewport { right: -49vw; bottom: -10svh; height: 48svh; height: 48dvh; }
-}
-
-@media (max-height: 520px) and (min-width: 641px) and (max-width: 960px) {
-  .robotViewport { right: -6vw; width: 58vw; height: 92svh; height: 92dvh; mask-image: radial-gradient(ellipse 67% 78% at 61% 55%, #000 48%, transparent 100%); }
-  [data-robot-stage^="service-"] .robotViewport { right: -18vw; width: 44vw; height: 70svh; height: 70dvh; }
-  [data-robot-stage="final"] .robotViewport { right: -35vw; bottom: -12svh; width: 62vw; height: 96svh; height: 96dvh; }
+  .fallbackFigure { width: min(46%, 24rem); }
+  .fallbackGrid { background-size: 3.2rem 3.2rem; }
+  [data-robot-stage="services"] .robotViewport { opacity: .16; height: 100svh; transform: translate3d(6vw, 0, 0) scale(.72); }
+  [data-robot-stage="process"] .robotViewport { opacity: .12; height: 100svh; transform: translate3d(6vw, 0, 0) scale(.68); }
+  [data-robot-stage="final"] .robotViewport { opacity: 1; height: 100svh; transform: translate3d(0, 2vh, 0) scale(.96); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,12 +3,16 @@ import Link from "next/link";
 import { ExperienceIntro } from "@/components/experience/ExperienceIntro";
 import { ExperienceShell } from "@/components/experience/ExperienceShell";
 import { FaqList } from "@/components/FaqList";
+import { HomeMotion } from "@/components/motion/HomeMotion";
+import { MobileActionBar } from "@/components/MobileActionBar";
 import { ProcessSteps } from "@/components/ProcessSteps";
-import { serviceInstruments, serviceStageBySlug } from "@/content/experience";
+import { PricingSwitcher } from "@/components/PricingSwitcher";
+import { serviceInstruments } from "@/content/experience";
 import { homeFaqs } from "@/content/faqs";
-import { featuredProjects } from "@/content/projects";
-import { commerceOffers, formatPrice, providerCostNote, webOffers } from "@/content/pricing";
+import { featuredProjects, projects } from "@/content/projects";
+import { commerceOffers, formatPrice, providerCostNote, quoteOffers, webOffers, type PricedOffer } from "@/content/pricing";
 import { services } from "@/content/services";
+import { site } from "@/content/site";
 import { JsonLd } from "@/lib/seo";
 import styles from "./home.module.css";
 
@@ -22,184 +26,270 @@ const homeServicesSchema = {
   })),
 };
 
+/** The trust strip counts real rows rather than repeating a hand-written number. */
+const evidencedProjectCount = projects.filter((project) => !project.missingAssets).length;
+const liveProjectCount = projects.filter((project) => project.status === "live").length;
+
+function PackageCards({ offers, service }: { offers: readonly PricedOffer[]; service: string }) {
+  return (
+    <div className={styles.packageGrid}>
+      {offers.map((offer, index) => (
+        <article
+          className={`${styles.packageCard} ${index === 1 ? styles.packageCardFeatured : ""}`}
+          key={offer.code}
+          data-stagger
+        >
+          <p className={`${styles.packageName} micro`}>{offer.name}</p>
+          <p className={styles.packagePrice}>{formatPrice(offer.price)}</p>
+          <p className={styles.packagePriceLabel}>hizmet bedeli</p>
+          <p className={styles.packageAudience}>{offer.audience}</p>
+          <ul className={styles.packageList}>
+            {offer.approach.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <Link
+            className={styles.packageCta}
+            href={`/iletisim?service=${service}&package=${encodeURIComponent(offer.name)}`}
+          >
+            Bu paketi konuşalım <span aria-hidden="true">↗</span>
+          </Link>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
-  const vela = featuredProjects[0];
-  const archiveProjects = featuredProjects.slice(1);
+  const [vela, ...showcase] = featuredProjects;
 
   return (
     <div className={styles.home} data-home-experience>
       <JsonLd data={homeServicesSchema} />
       <ExperienceIntro />
       <ExperienceShell />
+      <HomeMotion />
+      <MobileActionBar />
       <div className={styles.scrollRail} aria-hidden="true"><span /></div>
 
+      {/* 01 — Hero: what this studio does, then straight to the proof. */}
       <section className={styles.hero} data-robot-stage="hero" data-header-theme="dark">
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroCopy}>
-            <p className={`${styles.kicker} micro`}>cem//guide · etkileşimli 3D deneyim</p>
-            <h1 className={styles.heroTitle}>
-              <span>Cesur fikirler.</span>
-              <span>Çalışan dijital deneyimler.</span>
+            <p className={`${styles.kicker} micro`}>cemwebstudio · {site.location}</p>
+            {/* CSS-driven so the largest text paints without waiting for the motion runtime. */}
+            <h1 className={styles.heroTitle} data-intro-lines>
+              <span><span>Web sitesi, e-ticaret</span></span>
+              <span><span>ve mobil uygulama.</span></span>
+              <span><span>Tek elden.</span></span>
             </h1>
             <p className={styles.heroLead}>
-              Web tasarım, SEO, mobil uygulama ve e-ticareti stratejiyle aynı üretim çizgisinde buluşturuyorum.
+              Tasarımı da geliştirmeyi de doğrudan Cem yapar. Aracı yok, devir yok, tek sorumlu var.
             </p>
             <div className={styles.heroActions}>
-              <Link className={styles.primaryCta} href="/iletisim" prefetch={false}>Projenizi konuşalım <span aria-hidden="true">↗</span></Link>
-              <Link className={styles.secondaryCta} href="#secili-projeler">Çalışmaları keşfet <span aria-hidden="true">↓</span></Link>
+              <Link className={styles.primaryCta} href="#secili-projeler">
+                Yaptığım işler <span aria-hidden="true">↓</span>
+              </Link>
+              <Link className={styles.secondaryCta} href="/iletisim" prefetch={false}>
+                Projenizi konuşalım <span aria-hidden="true">↗</span>
+              </Link>
             </div>
-          </div>
-          <div className={styles.heroGuide} aria-hidden="true">
-            <span>01</span><i /><p>Dijital üretim rehberi</p>
+            <Link className={styles.budgetLink} href="#paketler">
+              Paketler ve bütçe <span aria-hidden="true">↓</span>
+            </Link>
+
+            <ul className={styles.trustStrip}>
+              <li><strong>{evidencedProjectCount}</strong> proje</li>
+              <li><strong>{liveProjectCount}</strong> yayında</li>
+              <li>Doğrudan Cem ile çalışma</li>
+              <li>{site.location}</li>
+            </ul>
           </div>
           <p className={`${styles.pointerHint} micro`}>ROBOTU İNCELEMEK İÇİN HAREKET ETTİRİN</p>
-          <p className={`${styles.scrollCue} micro`}>KEŞFETMEK İÇİN KAYDIR <span aria-hidden="true">↓</span></p>
         </div>
       </section>
 
-      <section className={styles.manifesto} data-robot-stage="manifesto" data-header-theme="light">
-        <div className="container">
-          <p className="eyebrow" data-reveal>YAKLAŞIM</p>
-          <p className={styles.manifestoText} data-reveal>
-            Fikri yalnızca iyi görünen değil, iyi çalışan bir dijital sisteme dönüştürüyorum.
-          </p>
-          <div className={styles.manifestoNotes} data-reveal>
-            <p>Strateji, tasarım, motion ve teknoloji aynı hedefe bakar.</p>
-            <p>Doğrudan Cem ile çalışır; karar, tasarım ve geliştirme arasında kaybolmazsınız.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.servicesLab} data-header-theme="light">
-        <div className={`container ${styles.labIntro}`} data-reveal>
-          <p className="eyebrow">HİZMET LABORATUVARI · 04 DİSİPLİN</p>
-          <h2>Bir hedef. Dört üretim modu.</h2>
-          <p>Kaydırdıkça odak değişir; içerik ve bağlantılar her zaman gerçek DOM akışında kalır.</p>
-        </div>
-
-        <div className={styles.serviceChapters}>
-          {services.map((service, index) => (
-            <article
-              className={styles.serviceChapter}
-              key={service.slug}
-              data-robot-stage={serviceStageBySlug[service.slug]}
-              data-service={service.slug}
-            >
-              <div className={`container ${styles.chapterInner}`}>
-                <div className={styles.chapterCopy} data-reveal>
-                  <p className={`${styles.chapterNumber} micro`}>0{index + 1} / 04</p>
-                  <h3>{service.shortTitle}</h3>
-                  <p className={styles.chapterPromise}>{service.promise}</p>
-                  <p className={styles.chapterSummary}>{service.summary}</p>
-                  <p className={styles.priceSignal}>{service.priceSignal}</p>
-                  <Link className="textLink" href={`/hizmetler/${service.slug}`}>Kapsamı keşfet <span aria-hidden="true">↗</span></Link>
-                </div>
-                <div className={styles.serviceInstrument} data-instrument={service.slug} aria-hidden="true">
-                  <span className={styles.instrumentIndex}>CW / 0{index + 1}</span>
-                  <span className={styles.instrumentOrbit}><i /><i /><i /></span>
-                  {serviceInstruments[service.slug].map((label, labelIndex) => (
-                    <span className={styles.instrumentLabel} data-index={labelIndex} key={label}>{label}</span>
-                  ))}
-                </div>
-                <span className={styles.mobileGuideMark} aria-hidden="true"><i />C/W</span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
+      {/* 02 — The work. First thing after the promise, because it is the proof. */}
       <section id="secili-projeler" className={styles.projects} data-robot-stage="projects" data-header-theme="dark">
         <div className="container">
           <div className={styles.projectsHeading} data-reveal>
-            <p className="eyebrow">SEÇİLİ PROJE PORTALI</p>
+            <p className="eyebrow">YAPILAN İŞLER</p>
             <h2>İş konuşsun.</h2>
-            <Link className={styles.lightLink} href="/projeler">Tüm proje arşivi ↗</Link>
+            <Link className={styles.lightLink} href="/projeler">Tüm proje arşivi <span aria-hidden="true">↗</span></Link>
           </div>
-          <article className={styles.featuredProject} data-reveal>
-            <Link className={styles.velaVisual} href={`/projeler/${vela.slug}`} aria-label="Vela Windsurfing proje detayını gör">
-              {vela.image ? <Image src={vela.image.src} alt={vela.image.alt} width={vela.image.width} height={vela.image.height} sizes="(min-width: 1344px) 1056px, (min-width: 700px) 86vw, calc(100vw - 2.5rem)" style={{ objectPosition: vela.image.position }} /> : null}
-              <span>Projeyi gör ↗</span>
+
+          <article className={styles.heroProject} data-reveal>
+            <Link className={styles.heroProjectVisual} href={`/projeler/${vela.slug}`} aria-label={`${vela.name} proje detayını gör`}>
+              {vela.image ? (
+                <Image
+                  src={vela.image.src}
+                  alt={vela.image.alt}
+                  width={vela.image.width}
+                  height={vela.image.height}
+                  priority
+                  sizes="(min-width: 1344px) 1216px, (min-width: 700px) 92vw, calc(100vw - 2.5rem)"
+                  style={{ objectPosition: vela.image.position }}
+                />
+              ) : null}
+              <span className={styles.heroProjectBadge}>{vela.statusLabel}</span>
             </Link>
-            <div className={styles.projectInfo}>
-              <div><p className="micro">01 · {vela.year} · {vela.statusLabel}</p><h3>{vela.name}</h3></div>
+            <div className={styles.heroProjectInfo}>
               <div>
-                <p>{vela.category}</p>
+                <p className="micro">{vela.year} · {vela.category}</p>
+                <h3>{vela.name}</h3>
+              </div>
+              <div>
                 <p>{vela.description}</p>
                 <div className={styles.projectLinks}>
-                  <Link href={`/projeler/${vela.slug}`}>Proje detayı ↗</Link>
-                  {vela.url ? <a href={vela.url} target="_blank" rel="noopener noreferrer">Canlı site ↗</a> : null}
+                  {vela.url ? <a href={vela.url} target="_blank" rel="noopener noreferrer">Canlı site <span aria-hidden="true">↗</span></a> : null}
+                  <Link href={`/projeler/${vela.slug}`}>Proje detayı <span aria-hidden="true">↗</span></Link>
                 </div>
               </div>
             </div>
           </article>
-          <div className={styles.archiveGrid}>
-            {archiveProjects.map((project, index) => (
-              <article className={styles.archiveCard} key={project.slug} data-reveal>
-                <Link href={`/projeler/${project.slug}`} className={styles.archiveVisual}>
-                  {project.image ? <Image src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} sizes="(min-width: 1344px) 552px, (min-width: 641px) calc(50vw - 4rem), calc(100vw - 2.5rem)" style={{ objectPosition: project.image.position }} /> : null}
-                  <span className="micro">0{index + 2} · ARŞİV</span>
-                  <strong>{project.name}</strong>
-                  <small>{project.missingAssets ? "İçerik hazırlanıyor" : "Projeyi gör ↗"}</small>
+
+          <div className={styles.showcaseGrid}>
+            {showcase.map((project, index) => (
+              <article className={styles.showcaseCard} key={project.slug} data-parallax={index % 2 === 0 ? "0.6" : "1"}>
+                <Link href={`/projeler/${project.slug}`} className={styles.showcaseVisual}>
+                  {project.image ? (
+                    <Image
+                      src={project.image.src}
+                      alt={project.image.alt}
+                      width={project.image.width}
+                      height={project.image.height}
+                      sizes="(min-width: 1344px) 600px, (min-width: 700px) 46vw, calc(100vw - 2.5rem)"
+                      style={{ objectPosition: project.image.position }}
+                    />
+                  ) : null}
+                  <span className={styles.showcaseArrow} aria-hidden="true">↗</span>
                 </Link>
-                <p>{project.category}</p>
+                <div className={styles.showcaseMeta}>
+                  <h3>{project.name}</h3>
+                  <p>{project.category} · {project.year ?? project.statusLabel}</p>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className={styles.pricing} data-robot-stage="pricing" data-header-theme="light">
+      {/* 03 — Services, compressed from four full-height scenes into one section. */}
+      <section id="hizmetler" className={styles.services} data-robot-stage="services" data-header-theme="light">
         <div className="container">
           <div className={styles.sectionIntro} data-reveal>
-            <p className="eyebrow">FİYAT KONTROL PANELİ</p>
-            <h2>Kapsamı baştan görün.</h2>
-            <p>Rakamlar hizmet bedelidir. İki ana üretim alanını okunaklı ve doğrudan karşılaştırın.</p>
+            <p className="eyebrow">NE YAPIYORUM</p>
+            <h2>Dört üretim modu.</h2>
+            <p>Strateji, tasarım ve geliştirme aynı elde ilerler; kapsam baştan konuşulur.</p>
           </div>
-          <div className={styles.priceSignals}>
-            <article data-reveal>
-              <p className="micro">WEB SİTESİ / BLOG</p>
-              <h3>{formatPrice(webOffers[0].price)}<span>’den başlayan hizmet bedeli</span></h3>
-              <ol>{webOffers.map((offer) => <li key={offer.code}><span>{offer.name}</span><strong>{formatPrice(offer.price)}</strong></li>)}</ol>
-            </article>
-            <article data-reveal>
-              <p className="micro">E-TİCARET</p>
-              <h3>{formatPrice(commerceOffers[0].price)}<span>’den başlayan hizmet bedeli</span></h3>
-              <ol>{commerceOffers.map((offer) => <li key={offer.code}><span>{offer.name}</span><strong>{formatPrice(offer.price)}</strong></li>)}</ol>
-            </article>
-          </div>
-          <div className={styles.pricingFoot} data-reveal>
-            <p>{providerCostNote}</p>
-            <Link className="button" href="/fiyatlandirma">Paketleri karşılaştır <span aria-hidden="true">↗</span></Link>
+          <div className={styles.serviceGrid}>
+            {services.map((service) => (
+              <article className={styles.serviceCard} key={service.slug} data-service={service.slug} data-stagger>
+                <div className={styles.serviceInstrument} aria-hidden="true">
+                  <span className={styles.instrumentOrbit}><i /><i /><i /></span>
+                </div>
+                <h3>{service.shortTitle}</h3>
+                <p className={styles.servicePromise}>{service.promise}</p>
+                <ul className={styles.serviceTags}>
+                  {serviceInstruments[service.slug].map((label) => <li key={label}>{label}</li>)}
+                </ul>
+                <p className={styles.servicePrice}>{service.priceSignal}</p>
+                <Link className="textLink" href={`/hizmetler/${service.slug}`}>
+                  Kapsamı keşfet <span aria-hidden="true">↗</span>
+                </Link>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* 04 — Budget. The visitor should not have to ask for a quote to know the range. */}
+      <section id="paketler" className={styles.pricing} data-robot-stage="pricing" data-header-theme="light">
+        <div className="container">
+          <div className={styles.sectionIntro} data-reveal>
+            <p className="eyebrow">PAKETLER VE BÜTÇE</p>
+            <h2>Bütçeyi baştan görün.</h2>
+            <p>Rakamlar hizmet bedelidir ve teklif istemeden burada durur.</p>
+          </div>
+
+          <PricingSwitcher
+            groups={[
+              {
+                id: "web",
+                label: "Web Sitesi & Blog",
+                heading: "Web Sitesi ve Blog paketleri",
+                panel: <PackageCards offers={webOffers} service="web-tasarim" />,
+              },
+              {
+                id: "eticaret",
+                label: "E-ticaret",
+                heading: "E-ticaret paketleri",
+                panel: <PackageCards offers={commerceOffers} service="e-ticaret" />,
+              },
+            ]}
+          />
+
+          <div className={styles.quoteGrid}>
+            {Object.values(quoteOffers).map((offer) => (
+              <article className={styles.quoteCard} key={offer.code} data-reveal>
+                <h3>{offer.name}</h3>
+                <p className={styles.quoteLabel}>{offer.priceLabel}</p>
+                <p>{offer.audience}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.pricingFoot} data-reveal>
+            <p className={styles.providerNote}>{providerCostNote}</p>
+            <Link className="button" href="/fiyatlandirma">
+              Paketleri detaylı karşılaştır <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 05 — Process, held to one screen. */}
       <section className={styles.process} data-robot-stage="process" data-header-theme="light">
         <div className="container">
-          <div className={styles.sectionIntro} data-reveal><p className="eyebrow">ÜRETİM HATTI</p><h2>Dört adım. Tek sorumlu.</h2><p>Keşiften yayına kadar aynı karar çizgisi; doğrudan Cem ile çalışma.</p></div>
-          <div className={styles.processLine} data-reveal><span aria-hidden="true" /><ProcessSteps /></div>
-          <div className={styles.solo} data-reveal>
-            <p className="micro">SOLO STÜDYO</p>
-            <p>Projeyi konuştuğunuz kişi, onu tasarlar ve geliştirir.</p>
-            <div><span>Doğrudan iletişim</span><span>Tek sorumluluk</span><span>Tutarlı kararlar</span></div>
-            <Link className="textLink" href="/hakkimda">Cem ile tanışın ↗</Link>
+          <div className={styles.sectionIntro} data-reveal>
+            <p className="eyebrow">NASIL ÇALIŞIYORUZ</p>
+            <h2>Dört adım. Tek sorumlu.</h2>
+            <p>Keşiften yayına kadar aynı karar çizgisi.</p>
           </div>
+          <div className={styles.processLine} data-progress-line>
+            <span aria-hidden="true" />
+            <ProcessSteps />
+          </div>
+          <p className={styles.soloNote} data-reveal>
+            Projeyi konuştuğunuz kişi, onu tasarlar ve geliştirir.
+            {" "}
+            <Link className="textLink" href="/hakkimda">Cem ile tanışın <span aria-hidden="true">↗</span></Link>
+          </p>
         </div>
       </section>
 
+      {/* 06 — Short FAQ, schema preserved. */}
       <section className={styles.faq} data-robot-stage="faq" data-header-theme="light">
         <div className="container">
-          <div className={styles.sectionIntro} data-reveal><p className="eyebrow">KISA SSS</p><h2>Başlamadan önce netleşsin.</h2></div>
+          <div className={styles.sectionIntro} data-reveal>
+            <p className="eyebrow">KISA SSS</p>
+            <h2>Başlamadan önce netleşsin.</h2>
+          </div>
           <div data-reveal><FaqList faqs={homeFaqs} includeSchema /></div>
         </div>
       </section>
 
+      {/* 07 — Close. The robot returns to full presence. */}
       <section className={styles.final} data-robot-stage="final" data-header-theme="dark">
         <div className={`container ${styles.finalInner}`}>
-          <p className="eyebrow">YENİ PROJE · cem//guide</p>
-          <h2>Birlikte bir şey üretelim.</h2>
-          <p>İlk adım, hedefinizi açıkça konuşmak.</p>
-          <Link className={styles.finalLink} href="/iletisim">Projenizi başlatın <span aria-hidden="true">↗</span></Link>
+          <p className="eyebrow">YENİ PROJE</p>
+          <h2 data-mask-lines><span><span>Birlikte bir şey</span></span><span><span>üretelim.</span></span></h2>
+          <p className={styles.finalLead}>İlk adım, hedefinizi açıkça konuşmak.</p>
+          <div className={styles.finalActions}>
+            <Link className={styles.finalCta} href="/iletisim">
+              Projenizi başlatın <span aria-hidden="true">↗</span>
+            </Link>
+            {/* No public email or WhatsApp exists in site.ts, so the form stays the only channel. */}
+            <p className={styles.finalAlt}>{site.owner} · {site.location}</p>
+          </div>
         </div>
       </section>
     </div>
