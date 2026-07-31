@@ -150,7 +150,10 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
 .finalCta .eyebrow { margin: 0; }
 .finalCta h2 { max-width: 13ch; }
 .finalCta .button { grid-column: 2; justify-self: start; margin-top: 2rem; }
-.siteFooter { padding-top: clamp(4rem, 8vw, 7rem); background: #050506; color: white; }
+/* The homepage's robot layer is a positioned, fixed canvas, so a static footer paints
+   underneath it — which left these links unclickable on pointer devices. Giving the
+   footer its own stacking position puts the opaque panel back on top. */
+.siteFooter { position: relative; z-index: 1; padding-top: clamp(4rem, 8vw, 7rem); background: #050506; color: white; }
 .footerGrid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; padding-bottom: 4rem; }
 .footerBrand { font-size: clamp(1.7rem, 4vw, 3.5rem); }
 .footerGrid > div:first-child p { color: #b6b8c1; max-width: 38ch; margin-top: 1.3rem; }
@@ -158,6 +161,10 @@ h3 { font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.15; letter-spacing: -.
 .footerGrid .micro { color: #747884; margin-bottom: .7rem; }
 /* Stacked footer links are thumb targets on a phone, so each one owns a full 44px row. */
 .footerGrid nav a, .footerGrid > div:last-child a { min-height: 2.75rem; display: inline-flex; align-items: center; }
+/* The number is the fastest way to reach the studio, so it reads a step louder than the
+   address beneath it. */
+.footerPhone { margin-top: .4rem; font-size: 1.05rem; font-weight: 680; letter-spacing: -.01em; }
+.footerGrid > div:last-child a:hover { color: #9fb4ff; }
 .footerBottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; border-top: 1px solid #25252b; padding-block: 1.2rem; color: #8e919c; font-size: .8rem; }
 .footerBottom a { min-height: 2.75rem; display: inline-flex; align-items: center; }
 .legal { max-width: 780px; }

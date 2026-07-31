@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { commerceOffers, providerCostNote, webOffers } from "./pricing";
 import { featuredProjects, getProject, projects } from "./projects";
+import { contact } from "./site";
 
 const verifiedProjectImages = {
   aysaworks: "/images/projects/aysaworks/aysaworks-cover.webp",
@@ -37,4 +38,10 @@ describe("production content invariants", () => {
     expect(new Set(projects.map((project) => project.slug)).size).toBe(projects.length);
   });
   it("describes third-party costs separately from the service fee", () => { expect(providerCostNote).toContain("hizmet bedelidir"); expect(providerCostNote).toContain("Alan adı"); expect(providerCostNote).toContain("hosting"); expect(providerCostNote).toContain("üçüncü taraf"); });
+  it("keeps the published number, its dial target and the WhatsApp link in agreement", () => {
+    expect(contact.phone).toBe("+90 530 411 50 22");
+    expect(contact.phoneHref).toBe(contact.phone.replaceAll(" ", ""));
+    expect(contact.email).toBe("info@cemwebstudio.com");
+    expect(contact.whatsappUrl.startsWith(`https://wa.me/${contact.phoneHref.slice(1)}?text=`)).toBe(true);
+  });
 });

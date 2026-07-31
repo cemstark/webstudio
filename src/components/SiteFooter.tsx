@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { navigation, site } from "@/content/site";
+import { contact, navigation, site } from "@/content/site";
 
 export function SiteFooter() {
   return (
@@ -19,7 +19,10 @@ export function SiteFooter() {
           <p className="micro">STÜDYO</p>
           <p>{site.owner}</p>
           <p>{site.location}</p>
-          <Link href="/iletisim">İletişim formu</Link>
+          {/* Direct channels rather than a second route to the form — the nav column
+              above already links it. */}
+          <a className="footerPhone" href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
         </div>
       </div>
       <div className="container footerBottom">

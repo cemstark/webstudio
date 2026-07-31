@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 import { contactSchema, serviceOptions } from "@/lib/contact";
+import { contact } from "@/content/site";
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_REQUESTS = 5;
@@ -16,10 +17,13 @@ function isRateLimited(ip: string, now: number) {
 
 function smtpConfig() {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_TO_EMAIL } = process.env;
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !CONTACT_TO_EMAIL) return null;
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) return null;
   const port = Number(SMTP_PORT);
   if (!Number.isInteger(port) || port <= 0) return null;
-  return { host: SMTP_HOST, port, secure: port === 465, auth: { user: SMTP_USER, pass: SMTP_PASS }, to: CONTACT_TO_EMAIL };
+  // The published address is the recipient unless an environment explicitly redirects it,
+  // so a missing CONTACT_TO_EMAIL cannot silently take the form offline.
+  const to = CONTACT_TO_EMAIL?.trim() || contact.email;
+  return { host: SMTP_HOST, port, secure: port === 465, auth: { user: SMTP_USER, pass: SMTP_PASS }, to };
 }
 
 export async function POST(request: Request) {
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
   if (now - parsed.data.startedAt < MIN_SUBMIT_MS) return NextResponse.json({ message: "Form çok hızlı gönderildi. Lütfen yeniden deneyin." }, { status: 400 });
 
   const config = smtpConfig();
-  if (!config) return NextResponse.json({ message: "E-posta servisi henüz yapılandırılmadı. Lütfen doğrudan e-posta ile iletişim kurun." }, { status: 503 });
+  if (!config) return NextResponse.json({ message: `E-posta servisi henüz yapılandırılmadı. Lütfen doğrudan ${contact.email} adresine yazın.` }, { status: 503 });
   const serviceLabel = serviceOptions.find((item) => item.value === parsed.data.service)?.label ?? parsed.data.service;
   const lines = [
     `Ad: ${parsed.data.name}`, `E-posta: ${parsed.data.email}`, `Telefon: ${parsed.data.phone || "—"}`, `Şirket / Marka: ${parsed.data.company || "—"}`,

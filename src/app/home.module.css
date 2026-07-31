@@ -49,8 +49,12 @@
    * effectively transparent. Reserving the whole band pushed the hero past one screen
    * for no visible gain, so the copy clears the robot's opaque core instead — which
    * keeps the whole hero inside `min-height: 100svh` on every phone we measure.
+   *
+   * Kept in step with the band's own `calc(100svh - 28rem)` reserve in
+   * experience.module.css. Stripping the hero back to one headline plus the contact
+   * details handed most of that reserve back to the robot.
    */
-  padding-bottom: 34svh;
+  padding-bottom: 38svh;
 }
 
 .heroCopy { display: grid; justify-items: start; }
@@ -76,20 +80,12 @@
 .heroTitle > span:nth-child(2) > span { animation-delay: 90ms; }
 .heroTitle > span:nth-child(3) > span { animation-delay: 180ms; }
 
-.heroLead {
-  max-width: 34ch;
-  margin-top: 1.15rem;
-  color: #c4c9d6;
-  font-size: 1rem;
-  line-height: 1.55;
-}
-
 /*
  * One full-width primary action on phones. The secondary action is demoted to a text
  * link rather than squeezed alongside it — and never hidden, which is what the old
  * short-viewport rule did to it.
  */
-.heroActions { display: grid; justify-items: start; gap: .2rem; width: 100%; margin-top: 1.5rem; }
+.heroActions { display: grid; justify-items: start; gap: .2rem; width: 100%; margin-top: 1.9rem; }
 
 .primaryCta {
   min-height: 3.1rem;
@@ -109,8 +105,7 @@
 
 .primaryCta:hover { background: #174de8; }
 
-.secondaryCta,
-.budgetLink {
+.secondaryCta {
   min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
@@ -118,33 +113,44 @@
   color: #c4c9d6;
   font-size: 1rem;
   font-weight: 650;
+  border-bottom: 1px solid #5b6376;
 }
 
-.secondaryCta { margin-top: .6rem; border-bottom: 1px solid #5b6376; }
-.budgetLink { color: #aeb5c6; border-bottom: 1px solid #454b5c; }
-.secondaryCta:hover, .budgetLink:hover { color: white; border-bottom-color: var(--blue); }
+.secondaryCta:hover { color: white; border-bottom-color: var(--blue); }
 
-.trustStrip {
-  display: flex;
-  gap: 1.35rem;
-  width: 100vw;
-  margin-top: 1.6rem;
-  margin-left: calc(var(--pad) * -1);
-  padding-inline: var(--pad);
-  overflow-x: auto;
-  scrollbar-width: none;
-  list-style: none;
-  color: #949bad;
-  font-family: var(--font-mono), monospace;
-  font-size: .74rem;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  white-space: nowrap;
+/* The row owns the offset the secondary link used to carry, so the WhatsApp button
+   stays centred against it instead of floating above a pushed-down link. */
+.heroContactRow { display: flex; align-items: center; gap: .65rem; margin-top: .6rem; }
+
+.whatsappCta {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3a4152;
+  border-radius: 999px;
+  color: #25d366;
+  transition: border-color var(--motion-quick), background-color var(--motion-quick), transform var(--motion-quick) var(--ease-expressive);
 }
 
-.trustStrip::-webkit-scrollbar { display: none; }
-.trustStrip strong { color: white; font-size: 1rem; }
-.trustStrip li { display: flex; align-items: baseline; gap: .35rem; }
+.whatsappCta:hover { border-color: #25d366; background: rgb(37 211 102 / .14); transform: translateY(-1px); }
+
+/* Direct channels, in the order a reader reaches for them: call first, write second. */
+.heroContact { display: grid; justify-items: start; margin-top: .5rem; }
+
+.heroPhone,
+.heroEmail {
+  min-height: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--motion-quick);
+}
+
+.heroPhone { color: #e9ecf4; font-size: 1.05rem; font-weight: 680; letter-spacing: -.01em; }
+.heroEmail { color: #9aa1b4; font-size: .95rem; font-weight: 600; }
+.heroPhone:hover, .heroEmail:hover { color: white; }
 
 .pointerHint { display: none; }
 
@@ -469,9 +475,8 @@
 /* ====================================================== tablet and wider */
 
 @media (min-width: 48rem) {
-  .heroInner { padding-top: max(7rem, 13svh); padding-bottom: 38svh; }
+  .heroInner { padding-top: max(7rem, 13svh); padding-bottom: 40svh; }
   .heroTitle { font-size: clamp(2.8rem, 5.6vw, 5rem); line-height: .9; letter-spacing: -.06em; }
-  .heroLead { max-width: 42ch; margin-top: 1.5rem; font-size: 1.1rem; }
 
   /* With room to breathe, the secondary action becomes a button beside the primary. */
   .heroActions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; width: auto; }
@@ -479,7 +484,6 @@
 
   .secondaryCta {
     min-height: 3.1rem;
-    margin-top: 0;
     padding: .8rem 1.3rem;
     border: 1px solid #4b5264;
     border-radius: 999px;
@@ -488,8 +492,10 @@
   }
 
   .secondaryCta:hover { background: white; border-color: white; color: var(--ink); }
-  .budgetLink { margin-top: 1.1rem; }
-  .trustStrip { width: auto; margin-left: 0; padding-inline: 0; overflow: visible; gap: 2rem; }
+  /* The action row's own gap replaces the stacked offset once everything sits on one line. */
+  .heroContactRow { margin-top: 0; gap: .75rem; }
+  .whatsappCta { width: 3.1rem; height: 3.1rem; border-color: #4b5264; }
+  .heroContact { margin-top: 1.4rem; }
 
   .projectsHeading { grid-template-columns: 1fr auto; align-items: end; }
   .projectsHeading .eyebrow { grid-column: 1; }
@@ -582,20 +588,18 @@
 @media (max-height: 46rem) and (max-width: 47.99rem) {
   .heroInner { padding-top: max(4.75rem, 8svh); padding-bottom: 30svh; }
   .heroTitle { font-size: clamp(1.85rem, 7.4vw, 2.6rem); }
-  .heroLead { margin-top: .85rem; }
-  .heroActions { margin-top: 1.1rem; }
-  .secondaryCta { margin-top: .35rem; }
-  .trustStrip { margin-top: 1.05rem; }
+  .heroActions { margin-top: 1.5rem; }
 }
 
 /* The smallest screens we support (320x568). The robot keeps a token presence at the
    foot of the hero rather than being half-buried under the copy. */
 @media (max-height: 36rem) and (max-width: 47.99rem) {
-  .heroInner { padding-top: max(3.5rem, 6svh); padding-bottom: 20svh; }
+  .heroInner { padding-top: max(3.5rem, 6svh); padding-bottom: 24svh; }
   .heroTitle { font-size: clamp(1.6rem, 7.4vw, 2.6rem); }
   .primaryCta { min-height: 2.9rem; }
-  .heroActions { margin-top: .9rem; }
-  .trustStrip { margin-top: .8rem; }
+  .heroActions { margin-top: 1.15rem; }
+  .whatsappCta { width: 2.5rem; height: 2.5rem; }
+  .heroContact { margin-top: .3rem; }
 }
 
 /*
@@ -613,7 +617,7 @@
 @media (prefers-reduced-motion: reduce) {
   .heroTitle > span > span { animation: none; }
   .scrollRail { display: none; }
-  .heroProjectVisual img, .showcaseVisual img, .showcaseArrow, .primaryCta, .secondaryCta, .finalCta, .showcaseMeta h3 { transition: none; }
+  .heroProjectVisual img, .showcaseVisual img, .showcaseArrow, .primaryCta, .secondaryCta, .whatsappCta, .finalCta, .showcaseMeta h3 { transition: none; }
   .showcaseArrow { opacity: 1; transform: none; }
   .processLine > span { transform: none; }
 }

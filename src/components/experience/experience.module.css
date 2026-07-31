@@ -45,9 +45,13 @@
    * The hero copy above is the same height on every phone, so a flat share of the
    * viewport put the robot's head behind the last links on shorter screens. The band
    * takes what the copy leaves instead, capped at the share it had before.
+   *
+   * The reserve tracks the copy: the hero is one headline plus phone, WhatsApp and
+   * e-mail, so 28rem covers it. `.heroInner`'s bottom padding in home.module.css mirrors
+   * this value — change one and the other has to follow.
    */
-  height: min(52svh, calc(100svh - 33.5rem));
-  height: min(52dvh, calc(100dvh - 33.5rem));
+  height: min(52svh, calc(100svh - 28rem));
+  height: min(52dvh, calc(100dvh - 28rem));
   overflow: hidden;
   isolation: isolate;
   opacity: 1;
@@ -234,7 +238,7 @@
  * with a smaller figure keeps the robot fully in frame and fully out of the copy.
  */
 @media (max-height: 46rem) and (max-width: 47.99rem) {
-  .robotViewport { height: 30svh; height: 30dvh; }
+  .robotViewport { height: 32svh; height: 32dvh; }
   .fallbackFigure { width: min(32%, 10rem); }
   .fallbackHalo { width: min(52%, 20rem); }
   [data-robot-stage="services"] .robotViewport { height: 22svh; }
@@ -245,7 +249,7 @@
 /* 320x568 class. Below this the copy and the robot cannot both have real room, so the
    robot keeps a token presence and the copy keeps all of its space. */
 @media (max-height: 36rem) and (max-width: 47.99rem) {
-  .robotViewport { height: 20svh; height: 20dvh; }
+  .robotViewport { height: 26svh; height: 26dvh; }
   .fallbackFigure { width: min(22%, 7rem); }
   .fallbackHalo { width: min(38%, 14rem); }
   [data-robot-stage="services"] .robotViewport { height: 16svh; }

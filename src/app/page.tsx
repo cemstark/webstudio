@@ -6,12 +6,13 @@ import { FaqList } from "@/components/FaqList";
 import { MobileActionBar } from "@/components/MobileActionBar";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { PricingSwitcher } from "@/components/PricingSwitcher";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { serviceInstruments } from "@/content/experience";
 import { homeFaqs } from "@/content/faqs";
-import { featuredProjects, projects } from "@/content/projects";
+import { featuredProjects } from "@/content/projects";
 import { commerceOffers, formatPrice, providerCostNote, quoteOffers, webOffers, type PricedOffer } from "@/content/pricing";
 import { services } from "@/content/services";
-import { site } from "@/content/site";
+import { contact, site } from "@/content/site";
 import { JsonLd } from "@/lib/seo";
 import styles from "./home.module.css";
 
@@ -24,10 +25,6 @@ const homeServicesSchema = {
     itemOffered: { "@type": "Service", name: service.shortTitle, description: service.summary },
   })),
 };
-
-/** The trust strip counts real rows rather than repeating a hand-written number. */
-const evidencedProjectCount = projects.filter((project) => !project.missingAssets).length;
-const liveProjectCount = projects.filter((project) => project.status === "live").length;
 
 function PackageCards({ offers, service }: { offers: readonly PricedOffer[]; service: string }) {
   return (
@@ -79,27 +76,31 @@ export default function Home() {
               <span><span>mobil uygulama.</span></span>
               <span><span>Tek elden.</span></span>
             </h1>
-            <p className={styles.heroLead}>
-              Tasarımı da geliştirmeyi de doğrudan Cem yapar. Aracı yok, devir yok, tek sorumlu var.
-            </p>
             <div className={styles.heroActions}>
               <Link className={styles.primaryCta} href="#secili-projeler">
                 Yaptığım işler <span aria-hidden="true">↓</span>
               </Link>
-              <Link className={styles.secondaryCta} href="/iletisim" prefetch={false}>
-                Projenizi konuşalım <span aria-hidden="true">↗</span>
-              </Link>
+              {/* The brief form and the instant channel sit together: whichever the reader
+                  prefers is one tap away, and neither is buried under the other. */}
+              <div className={styles.heroContactRow}>
+                <Link className={styles.secondaryCta} href="/iletisim" prefetch={false}>
+                  Projenizi konuşalım <span aria-hidden="true">↗</span>
+                </Link>
+                <a
+                  className={styles.whatsappCta}
+                  href={contact.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`WhatsApp'tan yazın: ${contact.phone}`}
+                >
+                  <WhatsAppIcon />
+                </a>
+              </div>
             </div>
-            <Link className={styles.budgetLink} href="#paketler">
-              Paketler ve bütçe <span aria-hidden="true">↓</span>
-            </Link>
-
-            <ul className={styles.trustStrip}>
-              <li><strong>{evidencedProjectCount}</strong> proje</li>
-              <li><strong>{liveProjectCount}</strong> yayında</li>
-              <li>Doğrudan Cem ile çalışma</li>
-              <li>{site.location}</li>
-            </ul>
+            <div className={styles.heroContact}>
+              <a className={styles.heroPhone} href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
+              <a className={styles.heroEmail} href={`mailto:${contact.email}`}>{contact.email}</a>
+            </div>
           </div>
           <p className={`${styles.pointerHint} micro`}>ROBOTU İNCELEMEK İÇİN HAREKET ETTİRİN</p>
         </div>

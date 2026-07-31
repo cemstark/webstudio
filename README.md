@@ -73,9 +73,9 @@ Adım 1B responsive QA çıktıları `qa/screenshots/step-1b/after/<profil>/<vie
 
 - `NEXT_PUBLIC_SITE_URL`: canonical, sitemap ve Open Graph URL tabanı.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`: Hostinger SMTP bağlantısı.
-- `CONTACT_TO_EMAIL`: brief e-postalarının ulaşacağı adres.
+- `CONTACT_TO_EMAIL`: brief e-postalarının ulaşacağı adres. Opsiyoneldir; tanımlı değilse `src/content/site.ts` içindeki yayınlanmış adres (`info@cemwebstudio.com`) kullanılır. Yalnızca briefleri başka bir kutuya yönlendirmek için doldurun.
 
-SMTP değişkenleri eksikse iletişim API’si kontrollü olarak `503` döndürür. Secret değerleri repoya veya istemci bundle’ına eklenmemelidir.
+SMTP değişkenleri eksikse iletişim API’si kontrollü olarak `503` döndürür ve ziyaretçiye doğrudan yazabileceği e-posta adresini gösterir. Formun canlıda çalışması için gereken tek gizli değer `SMTP_PASS`’tir. Secret değerleri repoya veya istemci bundle’ına eklenmemelidir.
 
 ## Hostinger Node.js Web App dağıtımı
 
